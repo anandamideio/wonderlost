@@ -1,0 +1,20 @@
+{
+  "extends": "@assetval/confs",
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "ESNext",
+    "typeRoots": [
+      "./node_modules/@types",
+      "./types"
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "test/**/*.test.ts",
+    "vitest.config.ts"
+  ]
+}

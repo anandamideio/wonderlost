@@ -1,0 +1,51 @@
+{
+  "name": "wonderlost",
+  "version": "1.0.0",
+  "description": "A FVTT module add features from the Wondershade system to the PF2e game system",
+  "scripts": {
+    "build": "unbuild",
+    "clean": "rm -rf dist",
+    "lint": "eslint .",
+    "test": "vitest run --coverage --config ./vitest.config.ts",
+    "iterate": "pnpm version patch && pnpm publish --access public --no-git-checks && git push --follow-tags"
+  },
+  "keywords": [],
+  "engines": {
+    "node": "22"
+  },
+  "authors": [
+    {
+      "name": "Antonio B.",
+      "email": "Abourassa@AssetVal.com",
+      "github": "https://github.com/Abourass"
+    }
+  ],
+  "license": "ISC",
+  "type": "module",
+  "main": "dist/Wonderlost.cjs",
+  "module": "dist/Wonderlost.mjs",
+  "types": "dist/Wonderlost.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/Wonderlost.d.ts",
+      "import": "./dist/Wonderlost.mjs",
+      "require": "./dist/Wonderlost.cjs"
+    }
+  },
+  "packageManager": "pnpm@9.10.0+sha512.73a29afa36a0d092ece5271de5177ecbf8318d454ecd701343131b8ebc0c1a91c487da46ab77c8e596d6acf1461e3594ced4becedf8921b074fbd8653ed7051c",
+  "devDependencies": {
+    "@assetval/confs": "^1.0.0",
+    "@magik_io/lint_golem": "^3.4.0",
+    "@types/jquery": "^3.5.30",
+    "@types/node": "^22.5.5",
+    "eslint": "^9.10.0",
+    "typescript-eslint": "^8.6.0"
+  },
+  "browserslist": [
+    "last 2 version",
+    "> 1%"
+  ]
+}
