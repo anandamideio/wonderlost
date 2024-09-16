@@ -7,6 +7,13 @@ settings:
 importers:
 
   .:
+    dependencies:
+      '@magik_io/mote':
+        specifier: ^1.6.5
+        version: 1.6.5
+      consola:
+        specifier: ^3.2.3
+        version: 3.2.3
     devDependencies:
       '@assetval/confs':
         specifier: ^1.0.0
@@ -74,6 +81,10 @@ packages:
   '@magik_io/lint_golem@3.4.0':
     resolution: {integrity: sha512-9M1B39PTlhVL5ghgxXGChJH+Xp8IfLfKMK2ofcdNBeViVp2/i1gmtFgI5tx7JOVaVKZXPZMLuZXwgnijSq+qeg==}
     engines: {node: '22'}
+
+  '@magik_io/mote@1.6.5':
+    resolution: {integrity: sha512-jGHWrS+O4fsMQZw5Q3ibcdpsPHE1xeL45/B+Mbw/CiAMQbPM30A/u8XULILnMDOSfimbY/HvnhzH9JjZ7rzEIw==}
+    engines: {node: 22.*.*}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -207,6 +218,10 @@ packages:
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
+
+  consola@3.2.3:
+    resolution: {integrity: sha512-I5qxpzLv+sJhTVEoLYNcTW+bThDCPsit0vLNKShZx6rLtpilNpmmeTPaeqJb9ZE9dV3DGaeby6Vuhrw38WjeyQ==}
+    engines: {node: ^14.18.0 || >=16.10.0}
 
   cross-spawn@7.0.3:
     resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
@@ -633,6 +648,8 @@ snapshots:
       - supports-color
       - typescript
 
+  '@magik_io/mote@1.6.5': {}
+
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -786,6 +803,8 @@ snapshots:
   color-name@1.1.4: {}
 
   concat-map@0.0.1: {}
+
+  consola@3.2.3: {}
 
   cross-spawn@7.0.3:
     dependencies:

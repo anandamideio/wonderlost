@@ -47,5 +47,9 @@
   "browserslist": [
     "last 2 version",
     "> 1%"
-  ]
+  ],
+  "dependencies": {
+    "@magik_io/mote": "^1.6.5",
+    "consola": "^3.2.3"
+  }
 }

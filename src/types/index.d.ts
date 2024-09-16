@@ -1,6 +1,8 @@
 /// <reference types="@types/node" />
 import * as JQuery from 'jquery';
 import { EventEmitter } from 'events';
+import "./foundry/index.d.mts";
+import "./types/index.d.mts";
 
 
 declare module '*.module.css'
@@ -772,6 +774,9 @@ declare class Localization {
 declare global {
   export const game: Game;
   export const Hooks: typeof HooksClass;
+  export const wonderlost: {
+    DEBUG: boolean
+  }
 }
 
 export { }
