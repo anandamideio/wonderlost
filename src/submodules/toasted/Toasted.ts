@@ -5,12 +5,25 @@ class Toasted extends Tome {
   public toasts: string[];
   public settings = new TomeRules({
     globalSettings: [],
-    clientSettings: []
+    clientSettings: [{
+      name: 'toastDuration',
+      type: Number,
+      defaultValue: 3000,
+      range: {
+        min: 1000,
+        max: 10000,
+        step: 250,
+      },
+      icon: 'clock',
+      restricted: false,
+    }]
   });
 
   constructor() {
     super({ moduleName: 'Toasted', moduleDescription: 'A simple toast notification system' });
     this.toasts = [];
+
+
   }
 
   addToast(message) {

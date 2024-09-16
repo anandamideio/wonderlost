@@ -63,15 +63,8 @@ export const isStringRule = (rule: Rules): rule is StringRule => rule.type insta
 type Rules = NumberRule | BooleanRule | StringRule;
 
 export class TomeRules {
-  private GlobalSettings: Array<NumberRule | BooleanRule | StringRule> = [];
-
-  private ClientSettings: Array<{
-    name: string;
-    type: Boolean | String | Number | Array<any> | Object;
-    default?: any;
-    icon?: string,
-    restricted?: boolean,
-  }> = [];
+  private GlobalSettings: Array<Rules> = [];
+  private ClientSettings: Array<Rules> = [];
 
   public get globalSettings() {
     return this.GlobalSettings;
@@ -99,13 +92,7 @@ export class TomeRules {
 
   constructor(pSettings?: {
     globalSettings: Array<NumberRule | BooleanRule | StringRule>;
-    clientSettings: Array<{
-      name: string;
-      type: Boolean | String | Number | Array<any> | Object;
-      default?: any;
-      icon?: string,
-      restricted?: boolean,
-    }>;
+    clientSettings: Array<Rules>;
   }) {
     if (pSettings) {
       this.GlobalSettings = [...pSettings.globalSettings];
