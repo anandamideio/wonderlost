@@ -1,7 +1,7 @@
 {
   "id": "wonderlost",
   "title": "Wonderlost",
-  "#{VERSION}# ": "0.1.0",
+  "version": "#{VERSION}#",
   "description": "A FVTT module to add features from the Wondershade system to the PF2e game system, as well as adding in features I think are missing Foundry.",
   "esmodules": [
     "greensock/esm/all.js",
@@ -30,7 +30,7 @@
     }
   ],
   "socket": true,
-  "#{MANIFEST}# ": "",
-  "#{DOWNLOAD}# ": "",
-  "#{URL}# ": ""
+  "manifest": "#{MANIFEST}#",
+  "download": "#{DOWNLOAD}#",
+  "url": "#{URL}#"
 }
