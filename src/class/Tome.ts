@@ -70,6 +70,7 @@ export abstract class Tome {
     pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
       settings?: TomeRuleConstructor;
       hooks?: Tome["hooks"];
+      DEBUG?: boolean;
     },
   ) {
     this.moduleName = pTome.moduleName;
@@ -88,10 +89,10 @@ export abstract class Tome {
         }) ?? []),
       );
     }
-    this.DEBUG = wonderlost?.DEBUG ?? false;
+    this.DEBUG = pTome?.DEBUG ?? false;
   }
 
-  public inititalizeSettings() {
+  public initializeSettings() {
     this.settings.forEach((setting) => {
       if (this.DEBUG) {
         consola.info(
@@ -135,6 +136,8 @@ export abstract class Tome {
       Hooks.on(event, callback);
       if (this.DEBUG) consola.info(`Registered hook for event: ${event}`);
     });
+
+    return this;
   }
 
   // Method to register global settings

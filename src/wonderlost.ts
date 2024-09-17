@@ -1,7 +1,32 @@
+import consola from 'consola';
 import { Toasted } from "./submodules/toasted/Toasted";
 
-Hooks.once("init", async function () {});
 
-Hooks.once("ready", async function () {});
+class Wonderlost {
+  public tomes = new Map([
+    ['Toasted', Toasted],
+  ])
 
-new Toasted();
+  constructor(public DEBUG = false) {
+    consola.info("Wonderlost | Initializing");
+    this.initializeTomes();
+
+  }
+
+  initializeTomes() {
+    this.tomes.forEach((tome, tomeName) => {
+      const t = new tome(this.DEBUG).initializeSettings().registerHooks();
+
+      if (this.DEBUG) {
+        consola.info(`Wonderlost | Initialized ${tome.name}`);
+      }
+    })
+  }
+}
+
+Hooks.once("init", async function () {
+  new Wonderlost(true);
+});
+
+Hooks.once("ready", async function () { });
+

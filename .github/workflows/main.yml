@@ -79,7 +79,7 @@ jobs:
 
       # Copy the wonderlost.mjs into the root folder
       - name: Copy wonderlost.mjs
-        run: cp dist/wonderlost.mjs wonderlost.mjs
+        run: cp dist/wonderlost.mjs wonderlost.js
 
 
       # Create a "module.zip" archive containing all the module's required files.
@@ -87,7 +87,7 @@ jobs:
       # your packaged module, add them here.
       # Create a zip file with all files required by the module to add to the release
       - name: Create Module Archive
-        run: zip -r ./module.zip module.json wonderlost.mjs LICENSE README.md lang/ packs/ styles/
+        run: zip -r ./module.zip module.json wonderlost.js LICENSE README.md lang/ packs/ styles/
 
       # Update the GitHub release with the manifest and module archive files.
       - name: Update Release With Files

@@ -8,7 +8,7 @@ export class Toasted extends Tome {
   public alwaysShowNotifications = false;
   public fadeOutDelay = 3000;
 
-  constructor() {
+  constructor(DEBUG = false) {
     super({
       moduleName: "Toasted",
       moduleDescription: "A simple toast notification system",
@@ -43,6 +43,7 @@ export class Toasted extends Tome {
           },
         ],
       ]),
+      DEBUG
     });
 
     this.registerSettings([
@@ -84,9 +85,7 @@ export class Toasted extends Tome {
           this.alwaysShowNotifications = Boolean(value);
         },
       },
-    ])
-      .inititalizeSettings()
-      .registerHooks();
+    ]);
   }
 
   protected removeMessage(

@@ -1,26 +1,26 @@
 'use strict';
 
-const mote = require('@magik_io/mote');
 const consola = require('consola');
+const mote = require('@magik_io/mote');
 const all_js = require('../../../../../scripts/greensock/esm/all.js');
 
 function _interopDefaultCompat (e) { return e && typeof e === 'object' && 'default' in e ? e.default : e; }
 
 const consola__default = /*#__PURE__*/_interopDefaultCompat(consola);
 
-var __defProp$1 = Object.defineProperty;
-var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$1(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField$1 = (obj, key, value) => {
-  __defNormalProp$1(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$2 = Object.defineProperty;
+var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$2 = (obj, key, value) => {
+  __defNormalProp$2(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 class Tome {
   constructor(pTome) {
-    __publicField$1(this, "moduleName");
-    __publicField$1(this, "moduleDescription");
-    __publicField$1(this, "settings", []);
-    __publicField$1(this, "hooks", /* @__PURE__ */ new Map([]));
-    __publicField$1(this, "DEBUG", false);
+    __publicField$2(this, "moduleName");
+    __publicField$2(this, "moduleDescription");
+    __publicField$2(this, "settings", []);
+    __publicField$2(this, "hooks", /* @__PURE__ */ new Map([]));
+    __publicField$2(this, "DEBUG", false);
     this.moduleName = pTome.moduleName;
     this.moduleDescription = pTome.moduleDescription;
     if (pTome?.settings) {
@@ -35,9 +35,9 @@ class Tome {
         }) ?? []
       );
     }
-    this.DEBUG = wonderlost?.DEBUG ?? false;
+    this.DEBUG = pTome?.DEBUG ?? false;
   }
-  inititalizeSettings() {
+  initializeSettings() {
     this.settings.forEach((setting) => {
       if (this.DEBUG) {
         consola__default.info(
@@ -74,6 +74,7 @@ class Tome {
       if (this.DEBUG)
         consola__default.info(`Registered hook for event: ${event}`);
     });
+    return this;
   }
   // Method to register global settings
   registerSetting(rule) {
@@ -180,14 +181,14 @@ class Tome {
   }
 }
 
-var __defProp = Object.defineProperty;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __publicField = (obj, key, value) => {
-  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+var __defProp$1 = Object.defineProperty;
+var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$1(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField$1 = (obj, key, value) => {
+  __defNormalProp$1(obj, typeof key !== "symbol" ? key + "" : key, value);
   return value;
 };
 class Toasted extends Tome {
-  constructor() {
+  constructor(DEBUG = false) {
     super({
       moduleName: "Toasted",
       moduleDescription: "A simple toast notification system",
@@ -210,12 +211,13 @@ class Toasted extends Tome {
             });
           }
         ]
-      ])
+      ]),
+      DEBUG
     });
-    __publicField(this, "toasts", []);
-    __publicField(this, "maxMessagesOnScreen", 5);
-    __publicField(this, "alwaysShowNotifications", false);
-    __publicField(this, "fadeOutDelay", 3e3);
+    __publicField$1(this, "toasts", []);
+    __publicField$1(this, "maxMessagesOnScreen", 5);
+    __publicField$1(this, "alwaysShowNotifications", false);
+    __publicField$1(this, "fadeOutDelay", 3e3);
     this.registerSettings([
       {
         name: "toastDuration",
@@ -255,7 +257,7 @@ class Toasted extends Tome {
           this.alwaysShowNotifications = Boolean(value);
         }
       }
-    ]).inititalizeSettings().registerHooks();
+    ]);
   }
   removeMessage(node, { time = 0.3, delay = this.fadeOutDelay } = {}) {
     if (this.fadeOutDelay < 0)
@@ -389,8 +391,32 @@ class Toasted extends Tome {
   }
 }
 
+var __defProp = Object.defineProperty;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __publicField = (obj, key, value) => {
+  __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
+  return value;
+};
+class Wonderlost {
+  constructor(DEBUG = false) {
+    this.DEBUG = DEBUG;
+    __publicField(this, "tomes", /* @__PURE__ */ new Map([
+      ["Toasted", Toasted]
+    ]));
+    consola__default.info("Wonderlost | Initializing");
+    this.initializeTomes();
+  }
+  initializeTomes() {
+    this.tomes.forEach((tome, tomeName) => {
+      new tome(this.DEBUG).initializeSettings().registerHooks();
+      if (this.DEBUG) {
+        consola__default.info(`Wonderlost | Initialized ${tome.name}`);
+      }
+    });
+  }
+}
 Hooks.once("init", async function() {
+  new Wonderlost(true);
 });
 Hooks.once("ready", async function() {
 });
-new Toasted();
