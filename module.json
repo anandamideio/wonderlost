@@ -1,0 +1,28 @@
+{
+  "id": "wonderlost",
+  "title": "Wonderlost",
+  "version": "0.1.0",
+  "description": "A FVTT module to add features from the Wondershade system to the PF2e game system, as well as adding in features I think are missing Foundry.",
+  "esmodules": ["greensock/esm/all.js", "dist/Wonderlost.mjs"],
+  "styles": ["styles/module.css"],
+  "compatibility": {
+    "minimum": "12",
+    "verified": "12"
+  },
+  "authors": [
+    {
+      "name": "ModernCannabist",
+      "discord": "moderncannabist",
+      "flags": {}
+    }
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lannguages/en.json",
+      "flags": {}
+    }
+  ],
+  "socket": true
+}

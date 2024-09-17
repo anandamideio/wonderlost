@@ -7,14 +7,11 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "target": "ESNext",
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ]
+    "baseUrl": ".",
+    "paths": {
+      "/scripts/greensock/esm/*": ["node_modules/gsap/dist/*"]
+    },
+    "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": [
-    "src/**/*.ts",
-    "test/**/*.test.ts",
-    "vitest.config.ts"
-  ]
+  "include": ["src/**/*.ts", "test/**/*.test.ts", "vitest.config.ts"]
 }

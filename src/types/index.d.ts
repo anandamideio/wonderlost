@@ -1,11 +1,10 @@
 /// <reference types="@types/node" />
-import * as JQuery from 'jquery';
-import { EventEmitter } from 'events';
+import * as JQuery from "jquery";
+import { EventEmitter } from "events";
 import "./foundry/index.d.mts";
 import "./types/index.d.mts";
 
-
-declare module '*.module.css'
+declare module "*.module.css";
 declare interface moduleStyle {
   userSpan: string;
   userSpanHidden: string;
@@ -17,11 +16,9 @@ declare interface moduleStyle {
 
 export default moduleStyle;
 
-interface RollTables {
-}
+interface RollTables {}
 
-interface Users {
-}
+interface Users {}
 
 /**
  * A simple event framework used throughout Foundry Virtual Tabletop.
@@ -79,7 +76,7 @@ declare class HooksClass {
       log?: string | null;
       notify?: string | null;
       data?: object;
-    }
+    },
   ): void;
 }
 
@@ -114,32 +111,43 @@ declare class _ClientSettings {
    * @param {object} data - The configuration data for the setting.
    * @throws {Error} If the namespace or key is not specified.
    */
-  public register(namespace: string, key: string, data: {
-    type: foundry.data.fields.DataField | foundry.data.abstract.DataModel | Function;
-    default?: any;
-    onChange?: (value: any) => void;
-    scope?: "client" | "world";
-    label?: string;
-    hint?: string;
-    name?: string;
-    config?: unknown;
-  } & Record<string, unknown>): void;
+  public register(
+    namespace: string,
+    key: string,
+    data: {
+      type:
+        | foundry.data.fields.DataField
+        | foundry.data.abstract.DataModel
+        | Function;
+      default?: any;
+      onChange?: (value: any) => void;
+      scope?: "client" | "world";
+      label?: string;
+      hint?: string;
+      name?: string;
+      config?: unknown;
+    } & Record<string, unknown>,
+  ): void;
 
   /**
-    * Register a new sub-settings menu.
-    *
-    * @param {string} namespace - The namespace under which the menu is registered.
-    * @param {string} key - The key for the menu.
-    * @param {object} data - The configuration data for the menu.
-    */
-  registerMenu(namespace: string, key: string, data: {
-    name: string;
-    label: string;
-    hint: string;
-    icon: string;
-    type: Function;
-    restricted: boolean;
-  }): void;
+   * Register a new sub-settings menu.
+   *
+   * @param {string} namespace - The namespace under which the menu is registered.
+   * @param {string} key - The key for the menu.
+   * @param {object} data - The configuration data for the menu.
+   */
+  registerMenu(
+    namespace: string,
+    key: string,
+    data: {
+      name: string;
+      label: string;
+      hint: string;
+      icon: string;
+      type: Function;
+      restricted: boolean;
+    },
+  ): void;
 
   /**
    * Registered settings menus which trigger secondary applications
@@ -171,11 +179,11 @@ declare class _ClientSettings {
   reset(key: string): void;
 
   /**
- * Get all settings within a namespace.
- *
- * @param {string} namespace - The namespace to retrieve settings from.
- * @returns {object} An object containing all settings within the namespace.
- */
+   * Get all settings within a namespace.
+   *
+   * @param {string} namespace - The namespace to retrieve settings from.
+   * @returns {object} An object containing all settings within the namespace.
+   */
   getNamespace(namespace: string): object;
 
   /**
@@ -187,13 +195,17 @@ declare class _ClientSettings {
 }
 
 /** A mixin that adds event emitter capabilities to a class */
-declare const EventEmitterMixin: <T extends new (...args: any[]) => Record<any, any>>(base: T) => T & EventEmitter;
+declare const EventEmitterMixin: <
+  T extends new (...args: any[]) => Record<any, any>,
+>(
+  base: T,
+) => T & EventEmitter;
 
 declare class Game {
   /**
-     * Localization support.
-     * @type {Localization}
-     */
+   * Localization support.
+   * @type {Localization}
+   */
   i18n: Localization;
   /** The current game version */
   version: string;
@@ -208,11 +220,11 @@ declare class Game {
   stop(): void;
   socket: SocketInterface;
   /**
-     * Request World data from server and return it.
-     * @param socket The active socket connection.
-     * @param view The view for which data is being requested.
-     * @returns A promise that resolves to the requested world data.
-     */
+   * Request World data from server and return it.
+   * @param socket The active socket connection.
+   * @param view The view for which data is being requested.
+   * @returns A promise that resolves to the requested world data.
+   */
   static getData(socket: SocketInterface, view: string): Promise<object>;
 
   /**
@@ -317,11 +329,22 @@ declare namespace foundry {
         }
 
         export class NumberField {
-          constructor(options: { required: boolean; min: number; max: number; step: number; initial: number });
+          constructor(options: {
+            required: boolean;
+            min: number;
+            max: number;
+            step: number;
+            initial: number;
+          });
         }
 
         export class StringField {
-          constructor(options: { required: boolean; blank: boolean; initial: string; choices: () => Record<string, string> });
+          constructor(options: {
+            required: boolean;
+            blank: boolean;
+            initial: string;
+            choices: () => Record<string, string>;
+          });
         }
       }
 
@@ -333,7 +356,10 @@ declare namespace foundry {
            * @param {DataValidationOptions} [options={}] Options which affect DataModel construction
            * @param {Document} [options.parent] A parent DataModel instance to which this DataModel belongs
            */
-          constructor(record?: object, options?: DataValidationOptions & { parent?: Document });
+          constructor(
+            record?: object,
+            options?: DataValidationOptions & { parent?: Document },
+          );
 
           /**
            * Initialize the source data for the DataModel.
@@ -341,7 +367,10 @@ declare namespace foundry {
            * @param {DataValidationOptions} [options={}] Options which affect DataModel construction.
            * @returns {object} The initialized data object.
            */
-          protected _initializeSource(record: object, options?: DataValidationOptions): object;
+          protected _initializeSource(
+            record: object,
+            options?: DataValidationOptions,
+          ): object;
 
           /**
            * Migrate old data to the new format.
@@ -395,7 +424,10 @@ declare namespace foundry {
          * @param {DataValidationOptions} [options={}] Options which affect DataModel construction
          * @param {Document} [options.parent] A parent DataModel instance to which this DataModel belongs
          */
-        constructor(record?: object, options?: DataValidationOptions & { parent?: Document });
+        constructor(
+          record?: object,
+          options?: DataValidationOptions & { parent?: Document },
+        );
 
         /**
          * Initialize the source data for the DataModel.
@@ -403,7 +435,10 @@ declare namespace foundry {
          * @param {DataValidationOptions} [options={}] Options which affect DataModel construction.
          * @returns {object} The initialized data object.
          */
-        protected _initializeSource(record: object, options?: DataValidationOptions): object;
+        protected _initializeSource(
+          record: object,
+          options?: DataValidationOptions,
+        ): object;
 
         /**
          * Migrate old data to the new format.
@@ -429,9 +464,9 @@ declare namespace foundry {
     }
     export namespace fields {
       /**
-         * An abstract class that defines the base pattern for a data field within a data schema.
-         * @abstract
-         */
+       * An abstract class that defines the base pattern for a data field within a data schema.
+       * @abstract
+       */
       export class DataField {
         name: string;
         parent?: DataField;
@@ -464,7 +499,11 @@ declare namespace foundry {
          * @param model The data model containing this field.
          * @param options Additional options for initialization.
          */
-        initialize(value: any, model: foundry.data.abstract.DataModel, options?: DataFieldOptions): void;
+        initialize(
+          value: any,
+          model: foundry.data.abstract.DataModel,
+          options?: DataFieldOptions,
+        ): void;
 
         /**
          * Convert the field's value to a plain object.
@@ -539,14 +578,14 @@ declare namespace foundry {
 declare class ApplicationV2 extends EventEmitterMixin(Object) {
   /**
    * Creates an instance of ApplicationV2.
-   * 
+   *
    * @param options - The options for the application.
    */
   constructor(options?: ApplicationV2.Options);
 
   /**
    * Renders the application.
-   * 
+   *
    * @param force - Whether to force rendering.
    * @param options - Additional rendering options.
    */
@@ -559,63 +598,63 @@ declare class ApplicationV2 extends EventEmitterMixin(Object) {
 
   /**
    * Sets the position of the application.
-   * 
+   *
    * @param position - The new position.
    */
   setPosition(position?: Partial<ApplicationV2.Position>): void;
 
   /**
    * Activates the listeners for the application.
-   * 
+   *
    * @param html - The HTML element.
    */
   activateListeners(html: JQuery): void;
 
   /**
    * Gets the data for the application.
-   * 
+   *
    * @returns The data.
    */
   getData(): Promise<ApplicationV2.Data>;
 
   /**
    * Handles the drop event.
-   * 
+   *
    * @param event - The drop event.
    */
   _onDrop(event: DragEvent): void;
 
   /**
    * Handles the drag start event.
-   * 
+   *
    * @param event - The drag start event.
    */
   _onDragStart(event: DragEvent): void;
 
   /**
    * Handles the drag over event.
-   * 
+   *
    * @param event - The drag over event.
    */
   _onDragOver(event: DragEvent): void;
 
   /**
    * Handles the drag leave event.
-   * 
+   *
    * @param event - The drag leave event.
    */
   _onDragLeave(event: DragEvent): void;
 
   /**
    * Handles the drag end event.
-   * 
+   *
    * @param event - The drag end event.
    */
   _onDragEnd(event: DragEvent): void;
 
   /**
    * Handles the drop event.
-   * 
+   *
    * @param event - The drop event.
    */
   _onDrop(event: DragEvent): void;
@@ -775,8 +814,8 @@ declare global {
   export const game: Game;
   export const Hooks: typeof HooksClass;
   export const wonderlost: {
-    DEBUG: boolean
-  }
+    DEBUG: boolean;
+  };
 }
 
-export { }
+export {};
