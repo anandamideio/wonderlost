@@ -22,17 +22,17 @@
   ],
   "license": "ISC",
   "type": "module",
-  "main": "dist/Wonderlost.cjs",
-  "module": "dist/Wonderlost.mjs",
-  "types": "dist/Wonderlost.d.ts",
+  "main": "dist/wonderlost.cjs",
+  "module": "dist/wonderlost.mjs",
+  "types": "dist/wonderlost.d.ts",
   "files": [
     "dist"
   ],
   "exports": {
     ".": {
-      "types": "./dist/Wonderlost.d.ts",
-      "import": "./dist/Wonderlost.mjs",
-      "require": "./dist/Wonderlost.cjs"
+      "types": "./dist/wonderlost.d.ts",
+      "import": "./dist/wonderlost.mjs",
+      "require": "./dist/wonderlost.cjs"
     }
   },
   "dependencies": {
