@@ -1,6 +1,7 @@
 import { El, Mote } from "@magik_io/mote";
 import { Tome } from "../../class/Tome";
 import gsap, { TweenMax } from "/scripts/greensock/esm/all.js";
+import consola from 'consola';
 
 export class Toasted extends Tome {
   public toasts: string[] = [];
@@ -43,12 +44,34 @@ export class Toasted extends Tome {
           },
         ],
       ]),
+      socketFns: new Map([
+        [
+          "module.toasted",
+          (data) => {
+            if (this.alwaysShowNotifications) {
+              ui.notifications?.info(data);
+              return;
+            }
+
+            consola.info(data);
+
+            // this.toasts.push(data);
+            // if (this.toasts.length > this.maxMessagesOnScreen) this.toasts.shift();
+
+            // const toast = ui.notifications?.info(data);
+            // toast?.element.addEventListener("click", () => {
+            //   this.toasts.shift();
+            //   toast.close();
+            // });
+          },
+        ]
+      ]),
       DEBUG
     });
 
     this.registerSettings([
       {
-        name: "toastDuration",
+        name: "Toast Duration",
         label: "How long would you like a message to stay on screen?",
         type: Number,
         defaultValue: this.fadeOutDelay,
@@ -61,7 +84,7 @@ export class Toasted extends Tome {
         },
       },
       {
-        name: "maxMessages",
+        name: "Max Messages",
         label: "How many messages would you like to see on screen (at most)?",
         type: Number,
         defaultValue: this.maxMessagesOnScreen,
@@ -74,8 +97,8 @@ export class Toasted extends Tome {
         },
       },
       {
-        name: "alwaysShowNotifications",
-        label: "Always show notifications",
+        name: "Always Show Notifications",
+        label: "Would you prefer toast are shown even if the chat panel is open?",
         type: Boolean,
         defaultValue: this.alwaysShowNotifications,
         icon: "eye",
@@ -105,10 +128,11 @@ export class Toasted extends Tome {
   }
 
   static expandSidebarInstant(sidebar: HTMLDivElement) {
-    if (!sidebar)
+    if (!sidebar) {
       throw new Error(
         "[Toasted:expandSidebarInstant] -> Error: Sidebar element was not passed",
       );
+    }
 
     const sideB = new El<"div", true>(sidebar)
       .removeClass("collapsed")
@@ -119,10 +143,11 @@ export class Toasted extends Tome {
       "#sidebar-tabs a.collapse i",
     ) as HTMLDivElement;
 
-    if (!icon)
+    if (!icon) {
       throw new Error(
         "[Toasted:expandSidebarInstant] -> Error: Icon element was not found",
       );
+    }
 
     new El(icon).removeClass("fa-caret-left").addClass("fa-caret-right");
 
@@ -138,8 +163,8 @@ export class Toasted extends Tome {
     const popupRect = document
       .querySelector(`.${this.name}`)!
       .getBoundingClientRect();
-    let x = event.clientX - popupRect.left + cardRect.left,
-      y = event.clientY - popupRect.top + cardRect.top;
+    let x = event.clientX - popupRect.left + cardRect.left;
+    let y = event.clientY - popupRect.top + cardRect.top;
 
     let target = document.elementFromPoint(x, y);
     let closestMessage = target?.closest(".message");
@@ -232,8 +257,9 @@ export class Toasted extends Tome {
       `[data-message-id="${messageId}"]`,
     );
     if (oldNode) return this.updateMessage(node, oldNode);
-    if (div.children.length >= this.maxMessagesOnScreen)
+    if (div.children.length >= this.maxMessagesOnScreen) {
       div.element.firstElementChild?.remove();
+    }
 
     div.child(node as HTMLDivElement, "append");
     TweenMax.from(node, 0.3, {

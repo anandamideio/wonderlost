@@ -53,24 +53,28 @@ export declare abstract class Tome {
         scope: "world" | "client";
     }>;
     hooks: Map<HookableEvents, HookEvent>;
+    socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
     constructor(pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
         settings?: TomeRuleConstructor;
         hooks?: Tome["hooks"];
+        socketFns?: Tome["socketFns"];
         DEBUG?: boolean;
     });
-    initializeSettings(): this;
     addHook(event: HookableEvents, callback: HookEvent, overwrite?: boolean): void;
-    registerHooks(): this;
+    initializeHooks(): this;
     registerSetting(rule: Rules & {
         scope: "world" | "client";
     }): Tome;
     registerSettings(rules: Array<Rules & {
         scope: "world" | "client";
     }>): Tome;
-    static expandObject(value: unknown): Record<string, unknown>;
     updateSettings(): void;
     saveSettings(): void;
+    initializeSettings(): this;
+    initializeSocketListeners(): this;
+    static expandObject(value: unknown): Record<string, unknown>;
+    static kabob(str: string): string;
 }
 export {};
 //# sourceMappingURL=Tome.d.ts.map

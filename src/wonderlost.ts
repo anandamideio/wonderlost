@@ -1,7 +1,6 @@
 import consola from 'consola';
 import { Toasted } from "./submodules/toasted/Toasted";
 
-
 class Wonderlost {
   public tomes = new Map([
     ['Toasted', Toasted],
@@ -10,12 +9,14 @@ class Wonderlost {
   constructor(public DEBUG = false) {
     consola.info("Wonderlost | Initializing");
     this.initializeTomes();
-
   }
 
   initializeTomes() {
     this.tomes.forEach((tome, tomeName) => {
-      const t = new tome(this.DEBUG).initializeSettings().registerHooks();
+      const t = new tome(this.DEBUG)
+        .initializeSettings()
+        .initializeHooks()
+        .initializeSocketListeners();
 
       if (this.DEBUG) {
         consola.info(`Wonderlost | Initialized ${tome.name}`);

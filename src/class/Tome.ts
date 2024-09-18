@@ -9,7 +9,6 @@ type HookEvent = (
 ) => void | Promise<void>;
 
 // Define types for the rules
-type RuleType = "Number" | "Boolean" | "String" | "Object" | "Array" | "Color";
 type RuleValue =
   | number
   | boolean
@@ -64,12 +63,14 @@ export abstract class Tome {
   public moduleDescription: string;
   public settings: Array<Rules & { scope: "world" | "client" }> = [];
   public hooks = new Map([] as Array<[HookableEvents, HookEvent]>);
+  public socketFns: Map<string, (data: unknown) => void> = new Map();
   public DEBUG?: boolean = false;
 
   constructor(
     pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
       settings?: TomeRuleConstructor;
       hooks?: Tome["hooks"];
+      socketFns?: Tome["socketFns"];
       DEBUG?: boolean;
     },
   ) {
@@ -89,34 +90,10 @@ export abstract class Tome {
         }) ?? []),
       );
     }
+
+    this.hooks = pTome?.hooks ?? new Map();
+    this.socketFns = pTome?.socketFns ?? new Map();
     this.DEBUG = pTome?.DEBUG ?? false;
-  }
-
-  public initializeSettings() {
-    this.settings.forEach((setting) => {
-      if (this.DEBUG) {
-        consola.info(
-          `[TOME::${this.moduleName}] => Registering ${setting.scope} setting: ${setting.name}`,
-        );
-      }
-
-      game.settings?.register(this.moduleName, setting.name, {
-        name: setting.name,
-        hint: setting.label,
-        scope: setting.scope,
-        config: true,
-        default: setting?.defaultValue,
-        type: setting.type as unknown as DataModel<any, any>,
-        // @ts-ignore
-        choices: setting?.choices,
-        // @ts-ignore
-        range: setting?.range,
-        onChange: setting.onChange,
-        requiresReload: setting.requiresReload,
-      });
-    });
-
-    return this;
   }
 
   public addHook(
@@ -131,7 +108,7 @@ export abstract class Tome {
     }
   }
 
-  public registerHooks() {
+  public initializeHooks() {
     this.hooks.forEach((callback, event) => {
       Hooks.on(event, callback);
       if (this.DEBUG) consola.info(`Registered hook for event: ${event}`);
@@ -187,28 +164,6 @@ export abstract class Tome {
       this.registerSetting(rule);
     });
     return this;
-  }
-
-  // Utility function to expand object rules
-  static expandObject(value: unknown): Record<string, unknown> {
-    if (typeof value === "object" && value !== null) {
-      return Object.entries(value).reduce(
-        (acc, [key, val]) => {
-          if (typeof val === "string") {
-            try {
-              acc[key] = JSON.parse(val);
-            } catch (e) {
-              acc[key] = val;
-            }
-          } else {
-            acc[key] = val;
-          }
-          return acc;
-        },
-        {} as Record<string, unknown>,
-      );
-    }
-    throw new Error(`Expected object but received ${typeof value}`);
   }
 
   // Method to update settings
@@ -268,5 +223,69 @@ export abstract class Tome {
 
     game.settings?.register(this.moduleName, "global", rules.world);
     game.settings?.register(this.moduleName, game!.user!.id, rules.client);
+  }
+
+  public initializeSettings() {
+    this.settings.forEach((setting) => {
+      if (this.DEBUG) {
+        consola.info(
+          `[TOME::${this.moduleName}] => Registering ${setting.scope} setting: ${setting.name}`,
+        );
+      }
+
+      game.settings?.register(this.moduleName, Tome.kabob(setting.name), {
+        name: setting.name,
+        hint: setting.label,
+        scope: setting.scope,
+        config: true,
+        default: setting?.defaultValue,
+        type: setting.type as unknown as DataModel<any, any>,
+        // @ts-ignore
+        choices: setting?.choices,
+        // @ts-ignore
+        range: setting?.range,
+        onChange: setting.onChange,
+        requiresReload: setting.requiresReload,
+      });
+    });
+
+    return this;
+  }
+
+  public initializeSocketListeners() {
+    if (this.socketFns.size === 0) return this;
+
+    this.socketFns.forEach((fn, event) => {
+      game.socket?.on(event, (data: unknown) => fn(data));
+    });
+
+    return this;
+  }
+
+  // Utility function to expand object rules
+  static expandObject(value: unknown): Record<string, unknown> {
+    if (typeof value === "object" && value !== null) {
+      return Object.entries(value).reduce(
+        (acc, [key, val]) => {
+          if (typeof val === "string") {
+            try {
+              acc[key] = JSON.parse(val);
+            } catch (e) {
+              acc[key] = val;
+            }
+          } else {
+            acc[key] = val;
+          }
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      );
+    }
+    throw new Error(`Expected object but received ${typeof value}`);
+  }
+
+  static kabob(str: string) {
+    if (!str) return "";
+    return str.split("").join("-");
   }
 }
