@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A FVTT module add features from the Wondershade system to the PF2e game system",
   "scripts": {
-    "build": "unbuild",
+    "build": "rm -rf dist && rollup -c",
     "clean": "rm -rf dist",
     "lint": "eslint .",
     "test": "vitest run --coverage --config ./vitest.config.ts",
@@ -42,12 +42,17 @@
   "devDependencies": {
     "@assetval/confs": "^1.0.0",
     "@magik_io/lint_golem": "^3.4.0",
+    "@rollup/plugin-alias": "^5.1.0",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/jquery": "^3.5.30",
     "@types/node": "^22.5.5",
     "eslint": "^9.10.0",
     "gsap": "^3.12.5",
-    "typescript-eslint": "^8.6.0",
-    "unbuild": "^2.0.0"
+    "rollup": "^4.21.3",
+    "tslib": "^2.7.0",
+    "typescript-eslint": "^8.6.0"
   },
   "browserslist": [
     "last 2 version",
