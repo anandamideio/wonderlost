@@ -46,14 +46,17 @@ export class Toasted extends Tome {
                 return;
               }
 
-              consola.box({
-                title: `this.moduleName | Hook Event for renderChatMessage`,
-                data: {
-                  app, html, options
-                },
-              })
+
 
               const newNode = html[0].cloneNode(true);
+              consola.box({
+                title: `${this.moduleName} | Hook Event for renderChatMessage`,
+                data: {
+                  app, html, options,
+                  nextAction: html[0],
+                  newNode,
+                },
+              })
               this.addMessage(newNode as ChildNode);
             });
           },
@@ -239,6 +242,15 @@ export class Toasted extends Tome {
       clientX: x,
       clientY: y,
     });
+
+    consola.info({
+      title: `${this.moduleName} | Delegating event to chat log`,
+      data: {
+        target, x, y, event,
+      },
+    })
+
+
     target.dispatchEvent(event);
   }
 
@@ -271,6 +283,13 @@ export class Toasted extends Tome {
     const oldNode = div.element.querySelector(
       `[data-message-id="${messageId}"]`,
     );
+
+    consola.info({
+      title: `${this.moduleName} | Adding message to chat log`,
+      data: {
+        node, oldNode, div, messageId,
+      },
+    })
     if (oldNode) return this.updateMessage(node, oldNode);
     if (div.children.length >= this.maxMessagesOnScreen) {
       div.element.firstElementChild?.remove();
@@ -281,6 +300,9 @@ export class Toasted extends Tome {
       height: 0,
       onComplete: () => {
         new El(node as HTMLDivElement).set({ height: "" });
+
+        consola.success(`${this.moduleName} | Message added to chat log`);
+
         this.removeMessage(node);
       },
     });
