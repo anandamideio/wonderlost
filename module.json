@@ -7,9 +7,6 @@
     "greensock/esm/all.js",
     "dist/wonderlost.mjs"
   ],
-  "scripts": [
-    "dist/wonderlost.mjs"
-  ],
   "styles": [
     "styles/module.css"
   ],
