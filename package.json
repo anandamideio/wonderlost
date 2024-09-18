@@ -46,7 +46,8 @@
     "@types/node": "^22.5.5",
     "eslint": "^9.10.0",
     "gsap": "^3.12.5",
-    "typescript-eslint": "^8.6.0"
+    "typescript-eslint": "^8.6.0",
+    "unbuild": "^2.0.0"
   },
   "browserslist": [
     "last 2 version",
@@ -56,42 +57,6 @@
   "pnpm": {
     "patchedDependencies": {
       "gsap": "patches/gsap.patch"
-    }
-  },
-  "unbuild": {
-    "declaration": true,
-    "failOnWarn": false,
-    "clean": true,
-    "external": [
-      "/scripts/greensock/esm/all.js",
-      "../../../../../scripts/greensock/esm/all.js"
-    ],
-    "rollup": {
-      "inlineDependencies": false,
-      "dts": {
-        "compilerOptions": {
-          "composite": false
-        },
-        "include": [
-          "src/**/*.ts"
-        ]
-      },
-      "esbuild": {
-        "tsconfigRaw": {
-          "extends": "./tsconfig.json",
-          "compilerOptions": {
-            "outDir": "dist",
-            "rootDir": "src",
-            "declaration": true,
-            "experimentalDecorators": true,
-            "emitDecoratorMetadata": true,
-            "target": "ESNext"
-          },
-          "include": [
-            "./src/**/*.ts"
-          ]
-        }
-      }
     }
   }
 }

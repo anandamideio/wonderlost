@@ -13,5 +13,5 @@
     },
     "typeRoots": ["./node_modules/@types", "./types"]
   },
-  "include": ["src/**/*.ts", "test/**/*.test.ts", "vitest.config.ts"]
+  "include": ["src/**/*.ts", "test/**/*.test.ts", "vitest.config.ts", "build.config.ts"],
 }

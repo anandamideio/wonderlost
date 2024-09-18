@@ -2,7 +2,7 @@
 
 const consola = require('consola');
 const mote = require('@magik_io/mote');
-const all_js = require('../../../../../scripts/greensock/esm/all.js');
+const all_js = require('/scripts/greensock/esm/all.js');
 
 function _interopDefaultCompat (e) { return e && typeof e === 'object' && 'default' in e ? e.default : e; }
 

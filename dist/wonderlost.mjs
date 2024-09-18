@@ -1,6 +1,6 @@
 import consola from 'consola';
 import { Mote, El } from '@magik_io/mote';
-import { TweenMax } from '../../../../../scripts/greensock/esm/all.js';
+import { TweenMax } from '/scripts/greensock/esm/all.js';
 
 var __defProp$2 = Object.defineProperty;
 var __defNormalProp$2 = (obj, key, value) => key in obj ? __defProp$2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
