@@ -416,7 +416,9 @@ class Wonderlost {
   }
 }
 Hooks.once("init", async function() {
+  consola__default.start("Wonderlost | Initialized");
   new Wonderlost(true);
+  consola__default.success("Wonderlost | Ready");
 });
 Hooks.once("ready", async function() {
 });

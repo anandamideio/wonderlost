@@ -25,7 +25,9 @@ class Wonderlost {
 }
 
 Hooks.once("init", async function () {
+  consola.start("Wonderlost | Initialized");
   new Wonderlost(true);
+  consola.success("Wonderlost | Ready");
 });
 
 Hooks.once("ready", async function () { });

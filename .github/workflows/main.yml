@@ -87,7 +87,7 @@ jobs:
       # your packaged module, add them here.
       # Create a zip file with all files required by the module to add to the release
       - name: Create Module Archive
-        run: zip -r ./module.zip module.json wonderlost.js LICENSE README.md lang/ packs/ styles/
+        run: zip -r ./module.zip module.json package.json wonderlost.js LICENSE README.md lang/ packs/ styles/
 
       # Update the GitHub release with the manifest and module archive files.
       - name: Update Release With Files

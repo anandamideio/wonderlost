@@ -60,6 +60,7 @@
   },
   "unbuild": {
     "declaration": true,
+    "failOnWarn": false,
     "clean": true,
     "external": [
       "/scripts/greensock/esm/all.js",
