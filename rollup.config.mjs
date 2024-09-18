@@ -1,6 +1,7 @@
 import terser from '@rollup/plugin-terser';
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
+import alias from '@rollup/plugin-alias';
 
 export default {
   input: 'src/wonderlost.ts',
@@ -12,6 +13,11 @@ export default {
     plugins: [terser()]
   },
   plugins: [
+    alias({
+      entries: [
+        { find: "/scripts/greensock/esm/all.js", replacement: "../../scripts/greensock/esm/all.js" },
+      ]
+    }),
     resolve({
       browser: true,
     }),
@@ -24,6 +30,6 @@ export default {
   ],
   external: [
     "/scripts/greensock/esm/all.js",
-    "../../../../../scripts/greensock/esm/all.js"
+    "../../scripts/greensock/esm/all.js"
   ],
 }
