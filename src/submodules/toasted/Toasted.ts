@@ -20,7 +20,7 @@ export class Toasted extends Tome {
             if (document.body.classList.contains("stream")) return;
             const chatTab = html[0];
 
-            new Mote(
+            const tab = new El(
               html[0]
                 .querySelector("#chat-log")!
                 .cloneNode(false) as unknown as `div#${string}`,
@@ -28,7 +28,8 @@ export class Toasted extends Tome {
               .addClass(this.moduleName)
               .on("click", (ev) => this.handleMouseEvent(ev))
               .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev))
-              .appendToBody();
+
+            document.querySelector('body')?.appendChild(tab.element);
 
             Hooks.on("renderChatMessage", (app, html, options) => {
               if (
