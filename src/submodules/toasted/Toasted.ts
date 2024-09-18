@@ -187,7 +187,7 @@ export class Toasted extends Tome {
     let target = document.elementFromPoint(x, y);
     let closestMessage = target?.closest(".message");
     let closestMessageID = new El(closestMessage as HTMLDivElement).data(
-      "message-id",
+      "messageId",
     );
 
     if (target && closestMessageID === messageID) {
@@ -205,7 +205,7 @@ export class Toasted extends Tome {
         target = document.elementFromPoint(x, y);
         closestMessage = target?.closest(".message");
         closestMessageID = new El(closestMessage as HTMLDivElement).data(
-          "message-id",
+          "messageId",
         );
 
         if (target && closestMessageID === messageID) return { target, x, y };
@@ -218,7 +218,7 @@ export class Toasted extends Tome {
   protected delegateEvent(n: Node, ev: MouseEvent) {
     const node = new El(n as HTMLDivElement);
     const card = new El("#chat-log").element.querySelector(
-      `[data-message-id="${node.data("message-id")}"]`,
+      `[data-message-id="${node.data("messageId")}"]`,
     ) as HTMLDivElement;
     // Card not found? strange.. just return
     if (!card) return;
@@ -227,7 +227,7 @@ export class Toasted extends Tome {
     const { target, x, y } = Toasted.findTarget(
       card,
       ev,
-      node.data("message-id")!,
+      node.data("messageId")!,
     );
     // If for some reason wrong one was found.. just do nothing
     if (!target) return;
@@ -277,7 +277,14 @@ export class Toasted extends Tome {
 
   protected addMessage(node: ChildNode) {
     const div = new El(`.${this.moduleName}`);
-    const messageId = div.data("message-id");
+    consola.log({
+      title: `${this.moduleName} | Adding message to chat log`,
+      badge: '📝',
+      data: {
+        div, node, divEl: div.element,
+      },
+    })
+    const messageId = new El(node as HTMLDivElement).data("messageId");
     if (!messageId) throw new Error("Message ID not found");
 
     const oldNode = div.element.querySelector(
