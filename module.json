@@ -5,10 +5,10 @@
   "description": "A FVTT module to add features from the Wondershade system to the PF2e game system, as well as adding in features I think are missing Foundry.",
   "esmodules": [
     "greensock/esm/all.js",
-    "wonderlost.js"
+    "dist/wonderlost.mjs"
   ],
   "scripts": [
-    "wonderlost.js"
+    "dist/wonderlost.mjs"
   ],
   "styles": [
     "styles/module.css"
