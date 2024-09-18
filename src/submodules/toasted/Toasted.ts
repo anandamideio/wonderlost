@@ -1,7 +1,7 @@
-import { El, Mote } from "@magik_io/mote";
-import { Tome } from "../../class/Tome";
-import gsap, { TweenMax } from "/scripts/greensock/esm/all.js";
+import { El } from "@magik_io/mote";
 import consola from 'consola';
+import { Tome } from "../../class/Tome";
+import { TweenMax } from "/scripts/greensock/esm/all.js";
 
 export class Toasted extends Tome {
   public toasts: string[] = [];
@@ -19,13 +19,20 @@ export class Toasted extends Tome {
           async (app, html) => {
             if (document.body.classList.contains("stream")) return;
             const chatTab = html[0];
+            consola.box({
+              title: `this.moduleName | Hook Event for renderChatLog`,
+              data: {
+                app, html, chatTab
+              },
+            });
 
-            const tab = new El(
+            const tab = new El<'div', true>(
               html[0]
                 .querySelector("#chat-log")!
                 .cloneNode(false) as unknown as `div#${string}`,
             )
               .addClass(this.moduleName)
+              .unset('id')
               .on("click", (ev) => this.handleMouseEvent(ev))
               .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev))
 
