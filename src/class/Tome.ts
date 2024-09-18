@@ -66,6 +66,14 @@ export abstract class Tome {
   public socketFns: Map<string, (data: unknown) => void> = new Map();
   public DEBUG?: boolean = false;
 
+  get name() {
+    return this.moduleName;
+  }
+
+  get lowercaseName() {
+    return this.moduleName.toLowerCase();
+  }
+
   constructor(
     pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
       settings?: TomeRuleConstructor;
@@ -110,8 +118,15 @@ export abstract class Tome {
 
   public initializeHooks() {
     this.hooks.forEach((callback, event) => {
+      if (this.DEBUG) {
+        consola.box({
+          title: `[TOME::${this.moduleName}] => Registering hook for ${event}`,
+          additional: { callback: callback.toString() },
+        })
+      }
+
       Hooks.on(event, callback);
-      if (this.DEBUG) consola.info(`Registered hook for event: ${event}`);
+
     });
 
     return this;
@@ -228,12 +243,13 @@ export abstract class Tome {
   public initializeSettings() {
     this.settings.forEach((setting) => {
       if (this.DEBUG) {
-        consola.info(
-          `[TOME::${this.moduleName}] => Registering ${setting.scope} setting: ${setting.name}`,
-        );
+        consola.box({
+          title: `[TOME::${this.moduleName}] => Registering ${setting.name}`,
+          additional: { ...setting },
+        });
       }
 
-      game.settings?.register(this.moduleName, Tome.kabob(setting.name), {
+      game.settings?.register(this.lowercaseName, Tome.kabob(setting.name), {
         name: setting.name,
         hint: setting.label,
         scope: setting.scope,
@@ -256,6 +272,10 @@ export abstract class Tome {
     if (this.socketFns.size === 0) return this;
 
     this.socketFns.forEach((fn, event) => {
+      if (this.DEBUG) {
+        consola.info(`Registering socket listener for event: ${event}`);
+      }
+
       game.socket?.on(event, (data: unknown) => fn(data));
     });
 

@@ -55,6 +55,8 @@ export declare abstract class Tome {
     hooks: Map<HookableEvents, HookEvent>;
     socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
+    get name(): string;
+    get lowercaseName(): string;
     constructor(pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
         settings?: TomeRuleConstructor;
         hooks?: Tome["hooks"];

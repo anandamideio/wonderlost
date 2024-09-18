@@ -15,7 +15,7 @@ export default {
   plugins: [
     alias({
       entries: [
-        { find: "/scripts/greensock/esm/all.js", replacement: "../../scripts/greensock/esm/all.js" },
+        { find: "/scripts/greensock/esm/all.js", replacement: "../../../scripts/greensock/esm/all.js" },
       ]
     }),
     resolve({
@@ -30,6 +30,6 @@ export default {
   ],
   external: [
     "/scripts/greensock/esm/all.js",
-    "../../scripts/greensock/esm/all.js"
+    "../../../scripts/greensock/esm/all.js"
   ],
 }

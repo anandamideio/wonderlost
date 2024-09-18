@@ -46,6 +46,13 @@ export class Toasted extends Tome {
                 return;
               }
 
+              consola.box({
+                title: `this.moduleName | Hook Event for renderChatMessage`,
+                data: {
+                  app, html, options
+                },
+              })
+
               const newNode = html[0].cloneNode(true);
               this.addMessage(newNode as ChildNode);
             });
