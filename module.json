@@ -7,6 +7,9 @@
     "greensock/esm/all.js",
     "wonderlost.js"
   ],
+  "scripts": [
+    "wonderlost.js"
+  ],
   "styles": [
     "styles/module.css"
   ],
@@ -17,7 +20,8 @@
   "authors": [
     {
       "name": "ModernCannabist",
-      "discord": "moderncannabist",
+      "discord": "ModernCannabist",
+      "github": "Abourass",
       "flags": {}
     }
   ],
