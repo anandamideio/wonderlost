@@ -249,7 +249,7 @@ export abstract class Tome {
         });
       }
 
-      game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName} ${setting.name}`), {
+      game.settings?.register('wonderlost', Tome.kabob(`${setting.name}`), {
         name: setting.name,
         hint: setting.label,
         scope: setting.scope,
