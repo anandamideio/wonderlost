@@ -1,0 +1,80 @@
+<!-- Toasted Settings -->
+<form class="flexcol">
+  <h2><label>{{localize "TOASTED.settings_name"}}</label></h2>
+
+  <!-- Toast Duration -->
+  <div class="form-group">
+    <label class="toasted-text pt-label-name">{{localize "TOASTED.toastDuration_name"}}</label>
+    <div class="form-fields">
+      <input class="toasted-text pt-toastDuration" type="number" value="{{toastDuration}}" />
+    </div>
+    <p class="notes">{{localize "TOASTED.toastDuration_hint"}}</p>
+  </div>
+  <br />
+
+  <!-- Toast Position -->
+  <div class="form-group">
+    <label class="toasted-text pt-label-name">{{localize "TOASTED.toastPosition_name"}}</label>
+    <div class="form-fields">
+      <select class="toasted-text pt-toastPosition" value="{{toastPosition}}">
+        <option value="top-left">{{localize "TOASTED.toastPosition_topLeft"}}</option>
+        <option value="top-right">{{localize "TOASTED.toastPosition_topRight"}}</option>
+        <option value="bottom-left">{{localize "TOASTED.toastPosition_bottomLeft"}}</option>
+        <option value="bottom-right">{{localize "TOASTED.toastPosition_bottomRight"}}</option>
+      </select>
+    </div>
+    <p class="notes">{{localize "TOASTED.toastPosition_hint"}}</p>
+  </div>
+  <br />
+
+  <!-- Toast Background Color -->
+  <div class="form-group">
+    <label class="toasted-text pt-label-name">{{localize "TOASTED.toastBgColor_name"}}</label>
+    <div class="form-fields">
+      <input type="color" value="{{toastBgColor}}" data-edit="color-input" />
+      <input name="color-input" class="toasted-text pt-toastBgColor" type="text" value="{{toastBgColor}}" />
+    </div>
+    <p class="notes">{{localize "TOASTED.toastBgColor_hint"}}</p>
+  </div>
+  <br />
+
+  <!-- Toast Text Color -->
+  <div class="form-group">
+    <label class="toasted-text pt-label-name">{{localize "TOASTED.toastTextColor_name"}}</label>
+    <div class="form-fields">
+      <input type="color" value="{{toastTextColor}}" data-edit="color-input" />
+      <input name="color-input" class="toasted-text pt-toastTextColor" type="text" value="{{toastTextColor}}" />
+    </div>
+    <p class="notes">{{localize "TOASTED.toastTextColor_hint"}}</p>
+  </div>
+  <br />
+
+  <!-- Toast Font Size -->
+  <div class="form-group">
+    <label class="toasted-text pt-label-name">{{localize "TOASTED.toastFontSize_name"}}</label>
+    <div class="form-fields">
+      <input class="toasted-text pt-toastFontSize" type="text" value="{{toastFontSize}}" />
+    </div>
+    <p class="notes">{{localize "TOASTED.toastFontSize_hint"}}</p>
+  </div>
+  <br />
+
+  <!-- Toast Shadow -->
+  <div class="form-group">
+    <label class="toasted-text pt-label-name">{{localize "TOASTED.toastShadow_name"}}</label>
+    <div class="form-fields">
+      {{#if toastShadow}}
+      <input class="toasted-text pt-toastShadow" type="checkbox" checked />
+      {{else}}
+      <input class="toasted-text pt-toastShadow" type="checkbox" />
+      {{/if}}
+    </div>
+    <p class="notes">{{localize "TOASTED.toastShadow_hint"}}</p>
+  </div>
+  <br />
+</form>
+<header class="toasted-text pt-submenu-header">
+  <button type="submit" name="submit" class="toasted-text pt-settings-save">
+    {{localize "TOASTED.saveButton"}}
+  </button>
+</header>

@@ -12,6 +12,11 @@
   z-index: 9999;
   overflow: hidden;
   opacity: var(--opacity);
+
+  > li {
+    margin: 0.5rem 0rem !important;
+    border-radius: 0.3rem !important;
+  }
 }
 
 .Toasted.settings {

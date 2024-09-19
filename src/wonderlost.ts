@@ -1,9 +1,11 @@
 import consola from 'consola';
 import { Toasted } from "./submodules/toasted/Toasted";
+import { Narrator } from './submodules/narrator/Narrator';
 
 class Wonderlost {
   public tomes = new Map([
     ['Toasted', Toasted],
+    ['Narrator', Narrator],
   ])
 
   constructor(public DEBUG = false) {
@@ -13,13 +15,13 @@ class Wonderlost {
 
   initializeTomes() {
     this.tomes.forEach((tome, tomeName) => {
-      const t = new tome(this.DEBUG)
+      new tome(this.DEBUG)
         .initializeSettings()
         .initializeHooks()
         .initializeSocketListeners();
 
       if (this.DEBUG) {
-        consola.info(`Wonderlost | Initialized ${tome.name}`);
+        consola.info(`Wonderlost | Initialized ${tomeName}`);
       }
     })
   }

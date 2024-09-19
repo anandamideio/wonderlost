@@ -1,3 +1,21 @@
 {
-    "MODULE.hello": "hello"
+    "MODULE.hello": "hello",
+    "TOASTED.settings_name": "Toasted Settings",
+    "TOASTED.toastDuration_name": "Toast Duration",
+    "TOASTED.toastDuration_hint": "Duration in milliseconds for how long the toast message will be displayed.",
+    "TOASTED.toastPosition_name": "Toast Position",
+    "TOASTED.toastPosition_hint": "Position on the screen where the toast message will appear.",
+    "TOASTED.toastPosition_topLeft": "Top Left",
+    "TOASTED.toastPosition_topRight": "Top Right",
+    "TOASTED.toastPosition_bottomLeft": "Bottom Left",
+    "TOASTED.toastPosition_bottomRight": "Bottom Right",
+    "TOASTED.toastBgColor_name": "Toast Background Color",
+    "TOASTED.toastBgColor_hint": "Background color of the toast message.",
+    "TOASTED.toastTextColor_name": "Toast Text Color",
+    "TOASTED.toastTextColor_hint": "Text color of the toast message.",
+    "TOASTED.toastFontSize_name": "Toast Font Size",
+    "TOASTED.toastFontSize_hint": "Font size of the toast message text.",
+    "TOASTED.toastShadow_name": "Toast Shadow",
+    "TOASTED.toastShadow_hint": "Enable or disable shadow for the toast message.",
+    "TOASTED.saveButton": "Save Settings"
 }

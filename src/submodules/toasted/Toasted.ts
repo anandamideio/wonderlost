@@ -2,10 +2,8 @@ import { El } from "@magik_io/mote";
 import consola from 'consola';
 import { Tome } from "../../class/Tome";
 import { TweenMax } from "/scripts/greensock/esm/all.js";
-import { WonderError } from 'src/class/WonderErrors';
 
 export class Toasted extends Tome {
-  public toasts: string[] = [];
   public maxMessagesOnScreen = 5;
   public alwaysShowNotifications = true;
   public fadeOutDelay = 3000;
@@ -13,7 +11,7 @@ export class Toasted extends Tome {
   constructor(DEBUG = false) {
     super({
       moduleName: "Toasted",
-      moduleDescription: "A simple toast notification system",
+      moduleDescription: "A customizable toast notification system",
       hooks: new Map([
         [
           "renderChatLog",
@@ -35,8 +33,7 @@ export class Toasted extends Tome {
         [
           "renderChatMessage",
           async (_app, html, _options) => {
-            const newNode = html[0].cloneNode(true);
-            this.addMessage(newNode as ChildNode);
+            this.addMessage(html[0].cloneNode(true) as ChildNode);
           }
         ]
       ]),
@@ -68,11 +65,10 @@ export class Toasted extends Tome {
     this.registerSettings([
       {
         name: "Toast Duration",
-        label: "How long would you like a message to stay on screen?",
+        hint: "How long would you like a message to stay on screen?",
         type: Number,
         defaultValue: this.fadeOutDelay,
         range: { min: 1000, max: 10000, step: 250 },
-        icon: "clock",
         scope: "client",
         restricted: false,
         onChange: (value) => {
@@ -81,11 +77,10 @@ export class Toasted extends Tome {
       },
       {
         name: "Max Messages",
-        label: "How many messages would you like to see on screen (at most)?",
+        hint: "How many messages would you like to see on screen (at most)?",
         type: Number,
         defaultValue: this.maxMessagesOnScreen,
         range: { min: 1, max: 10, step: 1 },
-        icon: "list",
         scope: "client",
         restricted: false,
         onChange: (value) => {
@@ -94,10 +89,9 @@ export class Toasted extends Tome {
       },
       {
         name: "Always Show Notifications",
-        label: "Would you prefer toast are shown even if the chat panel is open?",
+        hint: "Would you prefer toast are shown even if the chat panel is open?",
         type: Boolean,
         defaultValue: this.alwaysShowNotifications,
-        icon: "eye",
         scope: "client",
         restricted: false,
         onChange: (value) => {
@@ -114,9 +108,7 @@ export class Toasted extends Tome {
       opacity: 0,
       height: 0,
       delay,
-      onComplete: () => {
-        node.remove();
-      },
+      onComplete: () => { node.remove(); },
     });
   }
 
@@ -132,9 +124,7 @@ export class Toasted extends Tome {
       .unset(["width", "height"]);
     ui.sidebar._collapsed = false;
 
-    const icon = sideB.element.querySelector(
-      "#sidebar-tabs a.collapse i",
-    ) as HTMLDivElement;
+    const icon = sideB.element.querySelector("#sidebar-tabs a.collapse i") as HTMLDivElement;
 
     if (!icon) {
       throw new Error(
@@ -250,17 +240,14 @@ export class Toasted extends Tome {
   }
 
   protected addMessage(node: ChildNode) {
-    const div = new El(`.${this.moduleName}`);
+    const div = new El(`ol.${this.moduleName}`);
     if (!div) throw new Error("Chat log not found");
 
     const { messageId } = (node as HTMLElement).dataset;
-
-    consola.info({ div, node, divEl: div.element, messageId })
     if (!messageId) throw new Error("Message ID not found");
 
-    const oldNode = div.element.querySelector(
-      `[data-message-id="${messageId}"]`,
-    );
+    const oldNode = div.element
+      .querySelector(`[data-message-id="${messageId}"]`);
     if (oldNode) return this.updateMessage(node, oldNode);
     if (div.children.length >= this.maxMessagesOnScreen) {
       div.element.firstElementChild?.remove();
@@ -272,7 +259,7 @@ export class Toasted extends Tome {
       onComplete: () => {
         new El(node as HTMLDivElement).set({ height: "" });
 
-        consola.success(`${this.moduleName} | Message added to chat log`);
+        if (this.DEBUG) consola.success(`${this.moduleName} | Toasted message ${messageId}`);
 
         this.removeMessage(node);
       },

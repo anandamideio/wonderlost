@@ -1,5 +1,7 @@
 import consola from "consola";
+import type ApplicationV2 from 'src/types/foundry/client-esm/applications/api/application.mjs';
 import type { DataModel } from "src/types/foundry/common/abstract/module.mjs";
+import type { MaybePromise } from 'src/types/types/utils.mjs';
 
 type HookableEvents = "renderChatLog" | "renderChatMessage";
 type HookEvent = (
@@ -8,22 +10,22 @@ type HookEvent = (
   data?: any,
 ) => void | Promise<void>;
 
-// Define types for the rules
-type RuleValue =
-  | number
-  | boolean
-  | string
-  | Record<string, unknown>
-  | unknown[]
-  | string;
+interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {
+
+}
 
 interface Rule {
   name: string;
-  label?: string;
-  icon?: string;
+  hint?: string;
   restricted?: boolean;
   onChange?: (value: unknown) => void | Promise<void>;
+  /** true if you want to prompt the user to reload */
   requiresReload?: boolean;
+  /**
+   * @default true
+   * @comment false if you dont want it to show in module config
+   */
+  config?: boolean;
 }
 
 // Define rule-specific types
@@ -181,65 +183,6 @@ export abstract class Tome {
     return this;
   }
 
-  // Method to update settings
-  public updateSettings(): void {
-    const globalData = game.settings?.get(this.moduleName, "global") as Record<
-      string,
-      unknown
-    >;
-    const clientData = game.settings?.get(
-      this.moduleName,
-      game!.user!.id,
-    ) as Record<string, unknown>;
-
-    // Update global settings
-    this.settings.forEach((rule) => {
-      if (rule.scope === "world") {
-        rule?.onChange?.(globalData[rule.name]);
-      } else if (rule.scope === "client") {
-        rule?.onChange?.(clientData[rule.name]);
-      }
-    });
-  }
-
-  // Method to save settings
-  public saveSettings(): void {
-    const rules = {
-      world: {},
-      client: {},
-    } as Record<"world" | "client", Record<string, RuleValue>>;
-
-    this.settings.forEach((rule) => {
-      switch (rule.type) {
-        case Number:
-          rules[rule.scope][rule.name] = Number(rule.defaultValue);
-          break;
-        case Boolean:
-          rules[rule.scope][rule.name] = Boolean(rule.defaultValue);
-          break;
-        case String:
-          rules[rule.scope][rule.name] = String(rule.defaultValue);
-          break;
-        case Object:
-          rules[rule.scope][rule.name] = JSON.stringify(
-            Tome.expandObject(rule.defaultValue),
-          );
-          break;
-        case Array:
-          rules[rule.scope][rule.name] = JSON.stringify(
-            JSON.parse(String(rule.defaultValue)),
-          );
-          break;
-        case Color:
-          rules[rule.scope][rule.name] = String(rule.defaultValue);
-          break;
-      }
-    });
-
-    game.settings?.register(this.moduleName, "global", rules.world);
-    game.settings?.register(this.moduleName, game!.user!.id, rules.client);
-  }
-
   public initializeSettings() {
     this.settings.forEach((setting) => {
       if (this.DEBUG) {
@@ -249,16 +192,16 @@ export abstract class Tome {
         });
       }
 
-      game.settings?.register('wonderlost', Tome.kabob(`${setting.name}`), {
+      game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-${setting.name}`), {
         name: setting.name,
-        hint: setting.label,
+        hint: setting.hint,
         scope: setting.scope,
         config: true,
         default: setting?.defaultValue,
         type: setting.type as unknown as DataModel<any, any>,
-        // @ts-ignore
+        // @ts-ignore -> These are only there when the type is correct, but TS doesn't know that
         choices: setting?.choices,
-        // @ts-ignore
+        // @ts-ignore -> Same as above
         range: setting?.range,
         onChange: setting.onChange,
         requiresReload: setting.requiresReload,
@@ -266,6 +209,71 @@ export abstract class Tome {
     });
 
     return this;
+  }
+
+  public getSetting<ExpectedReturn = any>(settingName: string) {
+    return game.settings?.get('wonderlost', Tome.kabob(`${this.lowercaseName}-${settingName}`)) as ExpectedReturn;
+  }
+
+  public async setSetting(settingName: string, value: unknown) {
+    return game.settings?.set('wonderlost', Tome.kabob(`${this.lowercaseName}-${settingName}`), value);
+  }
+
+  // @ts-ignore
+  public static createSettingApp<Data extends Record<string, any> = Record<string, any>>(moduleName: string, data: Data, templateLocation: string) {
+    // @ts-ignore
+    return class extends FormApplication {
+      constructor() {
+        super({});
+      }
+
+      static get defaultOptions() {
+        return foundry.utils.mergeObject(super.defaultOptions, {
+          title: `Wonderlost: ${moduleName}`,
+          id: `${moduleName}-settings`,
+          width: 550,
+          height: "auto",
+          popOut: true,
+          closeOnSubmit: true,
+          template: templateLocation,
+        });
+      }
+
+      static get moduleName() {
+        return moduleName
+      }
+
+      getData() {
+        return foundry.utils.isEmpty(game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as any) ?
+          game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as MaybePromise<Data>
+          : data as MaybePromise<Data>;
+      }
+
+      async _updateObject(_event: Event, formData: Data) {
+        await game.settings?.set(moduleName, `${moduleName.toLowerCase()}-allSettings`, formData);
+      }
+    };
+  }
+
+  public registerSettingSubmenu<Data extends Record<string, any> = Record<string, any>>(menu: RuleMenu & { data: Data }) {
+    game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-allSettings`), {
+      scope: 'world',
+      config: false,
+      type: Object as unknown as DataModel<any, any>,
+      default: menu.data,
+    })
+
+    game.settings?.registerMenu('wonderlost', Tome.kabob(`${this.lowercaseName}-allSettings`), {
+      name: menu.name,
+      label: menu.label,
+      hint: menu.hint,
+      icon: menu.icon,
+      restricted: menu.restricted,
+      type: Tome.createSettingApp(
+        this.moduleName,
+        menu.data,
+        `modules/wonderlost/submodules/${this.lowercaseName}/settings.hbs`),
+    })
   }
 
   public initializeSocketListeners() {
