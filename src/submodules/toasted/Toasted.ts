@@ -21,7 +21,7 @@ export class Toasted extends Tome {
             if (document.body.classList.contains("stream")) return;
             const tab = new El<'div', true>(
               html[0]
-                .querySelector("#chat-log")!
+                .querySelector(`ol.${this.moduleName}`)!
                 .cloneNode(false) as unknown as `div#${string}`,
             )
               .addClass(this.moduleName)
@@ -193,7 +193,7 @@ export class Toasted extends Tome {
 
   protected delegateEvent(n: Node, ev: MouseEvent) {
     const node = new El(n as HTMLDivElement);
-    const card = new El("#chat-log").element.querySelector(
+    const card = new El(`.${this.moduleName}`).element.querySelector(
       `[data-message-id="${node.data("messageId")}"]`,
     ) as HTMLDivElement;
     // Card not found? strange.. just return
