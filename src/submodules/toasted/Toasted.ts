@@ -229,7 +229,7 @@ export class Toasted extends Tome {
   }
 
   protected addMessage(node: ChildNode) {
-    const div = new El(`ol.${this.moduleName}`);
+    const div = new El(`.${this.moduleName}`);
     if (!div) throw new Error("Chat log not found");
 
     const { messageId } = (node as HTMLElement).dataset;
