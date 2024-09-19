@@ -20,17 +20,19 @@ export class Toasted extends Tome {
           async (app, html) => {
             try {
               if (document.body.classList.contains("stream")) return;
-              this.menu = new El<'div', true>(
+              const div = new El<'div', true>(
                 html[0]
                   .querySelector(`#chat-log`)!
                   .cloneNode(false) as unknown as `div#${string}`,
               )
                 .addClass(this.moduleName)
-                .unset('id')
+                .id(this.lowercaseName)
                 .on("click", (ev) => this.handleMouseEvent(ev))
                 .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev));
 
-              document.querySelector('body')?.appendChild(this.menu.element);
+              document.querySelector('body')?.appendChild(div.element);
+
+              if (this.DEBUG) consola.success(`${this.moduleName} | Chat log rendered`);
             } catch (error) {
 
             }
@@ -236,8 +238,13 @@ export class Toasted extends Tome {
 
   protected addMessage(node: ChildNode) {
     if (!this.ready) return;
-    const div = this.menu;
-    if (!div) throw new Error("Chat log not found");
+    const div = new El(`#${this.lowercaseName}`);
+    if (!div) {
+      if (this.DEBUG) {
+        consola.error(`${this.moduleName} | Chat log not found`, { this: this, node, div });
+      }
+      throw new Error("Chat log not found");
+    }
 
     const { messageId } = (node as HTMLElement).dataset;
     if (!messageId) throw new Error("Message ID not found");
