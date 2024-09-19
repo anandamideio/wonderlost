@@ -1,0 +1,1 @@
+{"version":3,"file":"WonderErrors.d.ts","sourceRoot":"","sources":["../../src/class/WonderErrors.ts"],"names":[],"mappings":"AAAA,qBAAa,WAAY,SAAQ,KAAK;IAC7B,IAAI,EAAE,MAAM,CAAC;IACb,OAAO,EAAE,MAAM,CAAC;IAChB,KAAK,EAAE,MAAM,CAAC;IACd,IAAI,EAAE,MAAM,CAAC;gBACD,OAAO,EAAE,MAAM,EAAE,IAAI,EAAE,MAAM;IAQzC,QAAQ;IAIR,MAAM;;;;;;CAQd"}

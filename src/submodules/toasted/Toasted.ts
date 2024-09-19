@@ -2,11 +2,12 @@ import { El } from "@magik_io/mote";
 import consola from 'consola';
 import { Tome } from "../../class/Tome";
 import { TweenMax } from "/scripts/greensock/esm/all.js";
+import { WonderError } from 'src/class/WonderErrors';
 
 export class Toasted extends Tome {
   public toasts: string[] = [];
   public maxMessagesOnScreen = 5;
-  public alwaysShowNotifications = false;
+  public alwaysShowNotifications = true;
   public fadeOutDelay = 3000;
 
   constructor(DEBUG = false) {
@@ -18,14 +19,6 @@ export class Toasted extends Tome {
           "renderChatLog",
           async (app, html) => {
             if (document.body.classList.contains("stream")) return;
-            const chatTab = html[0];
-            consola.box({
-              title: `this.moduleName | Hook Event for renderChatLog`,
-              data: {
-                app, html, chatTab
-              },
-            });
-
             const tab = new El<'div', true>(
               html[0]
                 .querySelector("#chat-log")!
@@ -34,33 +27,18 @@ export class Toasted extends Tome {
               .addClass(this.moduleName)
               .unset('id')
               .on("click", (ev) => this.handleMouseEvent(ev))
-              .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev))
+              .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev));
 
             document.querySelector('body')?.appendChild(tab.element);
-
-            Hooks.on("renderChatMessage", (app, html, options) => {
-              if (
-                chatTab.classList.contains("active") &&
-                !chatTab.closest("#sidebar")?.classList.contains("collapsed")
-              ) {
-                return;
-              }
-
-
-
-              const newNode = html[0].cloneNode(true);
-              consola.box({
-                title: `${this.moduleName} | Hook Event for renderChatMessage`,
-                data: {
-                  app, html, options,
-                  nextAction: html[0],
-                  newNode,
-                },
-              })
-              this.addMessage(newNode as ChildNode);
-            });
           },
         ],
+        [
+          "renderChatMessage",
+          async (_app, html, _options) => {
+            const newNode = html[0].cloneNode(true);
+            this.addMessage(newNode as ChildNode);
+          }
+        ]
       ]),
       socketFns: new Map([
         [
@@ -129,10 +107,7 @@ export class Toasted extends Tome {
     ]);
   }
 
-  protected removeMessage(
-    node: ChildNode,
-    { time = 0.3, delay = this.fadeOutDelay } = {},
-  ) {
+  protected removeMessage(node: ChildNode, { time = 0.3, delay = this.fadeOutDelay } = {}) {
     if (this.fadeOutDelay < 0) return;
 
     TweenMax.to(node, time, {
@@ -195,7 +170,8 @@ export class Toasted extends Tome {
     }
     const targetRect = (event.target as HTMLElement).getBoundingClientRect();
     // If click element is obscured, rasterize the target and test if some point is free
-    // doing 10 steps in each direction, with a minimum of 5 px is some arbitrary number chosen, but i think its quite okayish in regards of accuracy and performance
+    // doing 10 steps in each direction, with a minimum of 5 px is some arbitrary number chosen, 
+    // but i think its quite okay in regards of accuracy and performance
     const dx = Math.min(targetRect.width / 10, 5);
     const dy = Math.min(targetRect.height / 10, 5);
     for (let vert = targetRect.top + 1; vert < targetRect.bottom; vert += dy) {
@@ -234,8 +210,7 @@ export class Toasted extends Tome {
 
     const event = new MouseEvent(ev.type, {
       bubbles: true,
-      // @ts-ignore
-      canceable: true,
+      cancelable: true,
       shiftKey: ev.shiftKey,
       metaKey: ev.metaKey,
       ctrlKey: ev.ctrlKey,
@@ -262,8 +237,7 @@ export class Toasted extends Tome {
     const tabBtn = document.getElementById("sidebar-tabs")?.children[0];
     if (tabBtn && !tabBtn.classList.contains("active")) {
       tabBtn.dispatchEvent(
-        // @ts-ignore
-        new MouseEvent("click", { bubbles: true, canceable: true }),
+        new MouseEvent("click", { bubbles: true, cancelable: true }),
       );
     }
 
@@ -277,26 +251,16 @@ export class Toasted extends Tome {
 
   protected addMessage(node: ChildNode) {
     const div = new El(`.${this.moduleName}`);
-    consola.log({
-      title: `${this.moduleName} | Adding message to chat log`,
-      badge: '📝',
-      data: {
-        div, node, divEl: div.element,
-      },
-    })
-    const messageId = new El(node as HTMLDivElement).data("messageId");
+    if (!div) throw new Error("Chat log not found");
+
+    const { messageId } = (node as HTMLElement).dataset;
+
+    consola.info({ div, node, divEl: div.element, messageId })
     if (!messageId) throw new Error("Message ID not found");
 
     const oldNode = div.element.querySelector(
       `[data-message-id="${messageId}"]`,
     );
-
-    consola.info({
-      title: `${this.moduleName} | Adding message to chat log`,
-      data: {
-        node, oldNode, div, messageId,
-      },
-    })
     if (oldNode) return this.updateMessage(node, oldNode);
     if (div.children.length >= this.maxMessagesOnScreen) {
       div.element.firstElementChild?.remove();
