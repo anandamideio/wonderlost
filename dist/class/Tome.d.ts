@@ -1,12 +1,19 @@
 type HookableEvents = "renderChatLog" | "renderChatMessage";
 type HookEvent = (app: Application, html: JQuery, data?: any) => void | Promise<void>;
+interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {
+}
 interface Rule {
     name: string;
-    label?: string;
-    icon?: string;
+    hint?: string;
     restricted?: boolean;
     onChange?: (value: unknown) => void | Promise<void>;
+    /** true if you want to prompt the user to reload */
     requiresReload?: boolean;
+    /**
+     * @default true
+     * @comment false if you dont want it to show in module config
+     */
+    config?: boolean;
 }
 type NumberRule = Rule & {
     type: typeof Number;
@@ -71,9 +78,12 @@ export declare abstract class Tome {
     registerSettings(rules: Array<Rules & {
         scope: "world" | "client";
     }>): Tome;
-    updateSettings(): void;
-    saveSettings(): void;
     initializeSettings(): this;
+    getSetting<ExpectedReturn = any>(settingName: string): ExpectedReturn;
+    setSetting(settingName: string, value: unknown): Promise<unknown>;
+    registerSettingSubmenu<Data extends Record<string, any> = Record<string, any>>(menu: RuleMenu & {
+        data: Data;
+    }): void;
     initializeSocketListeners(): this;
     static expandObject(value: unknown): Record<string, unknown>;
     static kabob(str: string): string;

@@ -219,42 +219,6 @@ export abstract class Tome {
     return game.settings?.set('wonderlost', Tome.kabob(`${this.lowercaseName}-${settingName}`), value);
   }
 
-  // @ts-ignore
-  public static createSettingApp<Data extends Record<string, any> = Record<string, any>>(moduleName: string, data: Data, templateLocation: string) {
-    // @ts-ignore
-    return class extends FormApplication {
-      constructor() {
-        super({});
-      }
-
-      static get defaultOptions() {
-        return foundry.utils.mergeObject(super.defaultOptions, {
-          title: `Wonderlost: ${moduleName}`,
-          id: `${moduleName}-settings`,
-          width: 550,
-          height: "auto",
-          popOut: true,
-          closeOnSubmit: true,
-          template: templateLocation,
-        });
-      }
-
-      static get moduleName() {
-        return moduleName
-      }
-
-      getData() {
-        return foundry.utils.isEmpty(game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as any) ?
-          game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as MaybePromise<Data>
-          : data as MaybePromise<Data>;
-      }
-
-      async _updateObject(_event: Event, formData: Data) {
-        await game.settings?.set(moduleName, `${moduleName.toLowerCase()}-allSettings`, formData);
-      }
-    };
-  }
-
   public registerSettingSubmenu<Data extends Record<string, any> = Record<string, any>>(menu: RuleMenu & { data: Data }) {
     game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-allSettings`), {
       scope: 'world',
@@ -263,16 +227,47 @@ export abstract class Tome {
       default: menu.data,
     })
 
+    const lowercaseName = `${this.lowercaseName}`;
+    const moduleName = this.moduleName.toString();
+
     game.settings?.registerMenu('wonderlost', Tome.kabob(`${this.lowercaseName}-allSettings`), {
       name: menu.name,
       label: menu.label,
       hint: menu.hint,
       icon: menu.icon,
       restricted: menu.restricted,
-      type: Tome.createSettingApp(
-        this.moduleName,
-        menu.data,
-        `modules/wonderlost/submodules/${this.lowercaseName}/settings.hbs`),
+      // @ts-ignore
+      type: class extends FormApplication {
+        constructor() {
+          super({});
+        }
+
+        static get defaultOptions() {
+          return foundry.utils.mergeObject(super.defaultOptions, {
+            title: `Wonderlost: ${moduleName}`,
+            id: `${moduleName}-settings`,
+            width: 550,
+            height: "auto",
+            popOut: true,
+            closeOnSubmit: true as boolean,
+            template: `modules/wonderlost/submodules/${lowercaseName}/settings.hbs`,
+          });
+        }
+
+        static get moduleName() {
+          return moduleName
+        }
+
+        getData() {
+          return foundry.utils.isEmpty(game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as any) ?
+            game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as MaybePromise<Data>
+            : menu.data as MaybePromise<Data>;
+        }
+
+        async _updateObject(_event: Event, formData: Data) {
+          await game.settings?.set(moduleName, `${moduleName.toLowerCase()}-allSettings`, formData);
+        }
+      }
     })
   }
 

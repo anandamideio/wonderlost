@@ -101,17 +101,6 @@ export class Toasted extends Tome {
     ]);
   }
 
-  protected removeMessage(node: ChildNode, { time = 0.3, delay = this.fadeOutDelay } = {}) {
-    if (this.fadeOutDelay < 0) return;
-
-    TweenMax.to(node, time, {
-      opacity: 0,
-      height: 0,
-      delay,
-      onComplete: () => { node.remove(); },
-    });
-  }
-
   static expandSidebarInstant(sidebar: HTMLDivElement) {
     if (!sidebar) {
       throw new Error(
@@ -257,12 +246,24 @@ export class Toasted extends Tome {
     TweenMax.from(node, 0.3, {
       height: 0,
       onComplete: () => {
-        new El(node as HTMLDivElement).set({ height: "" });
-
+        (node as HTMLDivElement).style.height = ""
         if (this.DEBUG) consola.success(`${this.moduleName} | Toasted message ${messageId}`);
 
-        this.removeMessage(node);
+        setTimeout(() => {
+          this.removeMessage(node);
+        }, this.fadeOutDelay);
       },
+    });
+  }
+
+  protected removeMessage(node: ChildNode, { time = 0.3, delay = this.fadeOutDelay } = {}) {
+    if (this.fadeOutDelay < 0) return;
+
+    TweenMax.to(node, time, {
+      opacity: 0,
+      height: 0,
+      delay,
+      onComplete: () => { node.remove(); },
     });
   }
 
