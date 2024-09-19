@@ -4,6 +4,7 @@ export declare class Toasted extends Tome {
     maxMessagesOnScreen: number;
     alwaysShowNotifications: boolean;
     fadeOutDelay: number;
+    ToastedReady: boolean;
     menu: El<'div', true> | null;
     constructor(DEBUG?: boolean);
     static expandSidebarInstant(sidebar: HTMLDivElement): void;

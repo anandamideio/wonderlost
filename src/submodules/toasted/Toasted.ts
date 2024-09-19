@@ -8,6 +8,8 @@ export class Toasted extends Tome {
   public alwaysShowNotifications = true;
   public fadeOutDelay = 3000;
 
+  public ToastedReady = false;
+
   public menu: El<'div', true> | null = null;
 
   constructor(DEBUG = false) {
@@ -16,7 +18,7 @@ export class Toasted extends Tome {
       moduleDescription: "A customizable toast notification system",
       hooks: new Map([
         [
-          "renderChatLog",
+          "ready",
           async (app, html) => {
             try {
               if (document.body.classList.contains("stream")) return;
@@ -32,6 +34,9 @@ export class Toasted extends Tome {
 
               document.querySelector('body')?.appendChild(div.element);
 
+              this.ready = true;
+              this.ToastedReady = true;
+
               if (this.DEBUG) consola.success(`${this.moduleName} | Chat log rendered`);
             } catch (error) {
 
@@ -41,7 +46,9 @@ export class Toasted extends Tome {
         [
           "renderChatMessage",
           async (_app, html, _options) => {
-            this.addMessage(html[0].cloneNode(true) as ChildNode);
+            if (this.ready && this.ToastedReady) {
+              this.addMessage(html[0].cloneNode(true) as ChildNode);
+            }
           }
         ]
       ]),
