@@ -238,7 +238,7 @@ export class Toasted extends Tome {
 
   protected addMessage(node: ChildNode) {
     if (!this.ready) return;
-    const div = new El(`#${this.lowercaseName}`);
+    const div = document.querySelector(`.${this.moduleName}`) ?? document.querySelector(`#${this.lowercaseName}`);
     if (!div) {
       if (this.DEBUG) {
         consola.error(`${this.moduleName} | Chat log not found`, { this: this, node, div });
@@ -249,14 +249,13 @@ export class Toasted extends Tome {
     const { messageId } = (node as HTMLElement).dataset;
     if (!messageId) throw new Error("Message ID not found");
 
-    const oldNode = div.element
-      .querySelector(`[data-message-id="${messageId}"]`);
+    const oldNode = div.querySelector(`[data-message-id="${messageId}"]`);
     if (oldNode) return this.updateMessage(node, oldNode);
     if (div.children.length >= this.maxMessagesOnScreen) {
-      div.element.firstElementChild?.remove();
+      div.firstElementChild?.remove();
     }
 
-    div.child(node as HTMLDivElement, "append");
+    div.appendChild(node);
     TweenMax.from(node, 0.3, {
       height: 0,
       onComplete: () => {
