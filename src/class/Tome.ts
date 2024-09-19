@@ -3,7 +3,9 @@ import type ApplicationV2 from 'src/types/foundry/client-esm/applications/api/ap
 import type { DataModel } from "src/types/foundry/common/abstract/module.mjs";
 import type { MaybePromise } from 'src/types/types/utils.mjs';
 
-type HookableEvents = "renderChatLog" | "renderChatMessage";
+type CoreLifeCycleHooks = 'init' | 'ready' | 'error' | 'setup' | 'i18nInit'
+
+type HookableEvents = "renderChatLog" | "renderChatMessage" | 'renderApplication' | CoreLifeCycleHooks
 type HookEvent = (
   app: Application,
   html: JQuery,
@@ -26,6 +28,7 @@ interface Rule {
    * @comment false if you dont want it to show in module config
    */
   config?: boolean;
+  choices?: Record<string, string>;
 }
 
 // Define rule-specific types
@@ -75,6 +78,24 @@ export abstract class Tome {
 
   get lowercaseName() {
     return this.moduleName.toLowerCase();
+  }
+
+  get hasHooks() {
+    return this.hooks.size > 0;
+  }
+
+  get hasSettings() {
+    return this.settings.length > 0;
+  }
+
+  get hasSocketFns() {
+    return this.socketFns.size > 0;
+  }
+
+  get needsEarlyInitialization() {
+    return (this.hasSettings
+      || (this.hasHooks && this.hooks.has('init') || this.hasHooks && this.hooks.has('ready'))
+      || this.hasSocketFns)
   }
 
   constructor(
@@ -286,12 +307,19 @@ export abstract class Tome {
   }
 
   public initialize() {
-    this.initializeSettings()
-      .initializeHooks()
-      .initializeSocketListeners();
+    if (this.hasSettings) {
+      this.initializeSettings()
+    }
+
+    if (this.hasHooks) {
+      this.initializeHooks();
+    }
+
+    if (this.hasSocketFns) {
+      this.initializeSocketListeners();
+    }
 
     this.ready = true;
-
 
     return this;
   }

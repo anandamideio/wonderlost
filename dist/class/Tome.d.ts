@@ -1,4 +1,5 @@
-type HookableEvents = "renderChatLog" | "renderChatMessage";
+type CoreLifeCycleHooks = 'init' | 'ready' | 'error' | 'setup' | 'i18nInit';
+type HookableEvents = "renderChatLog" | "renderChatMessage" | 'renderApplication' | CoreLifeCycleHooks;
 type HookEvent = (app: Application, html: JQuery, data?: any) => void | Promise<void>;
 interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {
 }
@@ -14,6 +15,7 @@ interface Rule {
      * @comment false if you dont want it to show in module config
      */
     config?: boolean;
+    choices?: Record<string, string>;
 }
 type NumberRule = Rule & {
     type: typeof Number;
@@ -65,6 +67,10 @@ export declare abstract class Tome {
     ready: boolean;
     get name(): string;
     get lowercaseName(): string;
+    get hasHooks(): boolean;
+    get hasSettings(): boolean;
+    get hasSocketFns(): boolean;
+    get needsEarlyInitialization(): boolean;
     constructor(pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
         settings?: TomeRuleConstructor;
         hooks?: Tome["hooks"];
