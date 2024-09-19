@@ -7,9 +7,7 @@
     "greensock/esm/all.js",
     "dist/wonderlost.mjs"
   ],
-  "scripts": [
-    "scripts/libs/ffontsloader/fontsloader.min.js"
-  ],
+  "scripts": [],
   "styles": [
     "styles/module.css"
   ],
