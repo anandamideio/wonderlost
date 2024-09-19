@@ -15,10 +15,7 @@ class Wonderlost {
 
   initializeTomes() {
     this.tomes.forEach((tome, tomeName) => {
-      new tome(this.DEBUG)
-        .initializeSettings()
-        .initializeHooks()
-        .initializeSocketListeners();
+      new tome(this.DEBUG).initialize();
 
       if (this.DEBUG) {
         consola.info(`Wonderlost | Initialized ${tomeName}`);

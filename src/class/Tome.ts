@@ -67,6 +67,7 @@ export abstract class Tome {
   public hooks = new Map([] as Array<[HookableEvents, HookEvent]>);
   public socketFns: Map<string, (data: unknown) => void> = new Map();
   public DEBUG?: boolean = false;
+  public ready = false;
 
   get name() {
     return this.moduleName;
@@ -128,7 +129,6 @@ export abstract class Tome {
       }
 
       Hooks.on(event, callback);
-
     });
 
     return this;
@@ -281,6 +281,17 @@ export abstract class Tome {
 
       game.socket?.on(event, (data: unknown) => fn(data));
     });
+
+    return this;
+  }
+
+  public initialize() {
+    this.initializeSettings()
+      .initializeHooks()
+      .initializeSocketListeners();
+
+    this.ready = true;
+
 
     return this;
   }

@@ -62,6 +62,7 @@ export declare abstract class Tome {
     hooks: Map<HookableEvents, HookEvent>;
     socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
+    ready: boolean;
     get name(): string;
     get lowercaseName(): string;
     constructor(pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
@@ -85,6 +86,7 @@ export declare abstract class Tome {
         data: Data;
     }): void;
     initializeSocketListeners(): this;
+    initialize(): this;
     static expandObject(value: unknown): Record<string, unknown>;
     static kabob(str: string): string;
 }

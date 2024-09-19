@@ -8,6 +8,8 @@ export class Toasted extends Tome {
   public alwaysShowNotifications = true;
   public fadeOutDelay = 3000;
 
+  public menu: El<'div', true> | null = null;
+
   constructor(DEBUG = false) {
     super({
       moduleName: "Toasted",
@@ -16,18 +18,22 @@ export class Toasted extends Tome {
         [
           "renderChatLog",
           async (app, html) => {
-            if (document.body.classList.contains("stream")) return;
-            const tab = new El<'div', true>(
-              html[0]
-                .querySelector(`#chat-log`)!
-                .cloneNode(false) as unknown as `div#${string}`,
-            )
-              .addClass(this.moduleName)
-              .unset('id')
-              .on("click", (ev) => this.handleMouseEvent(ev))
-              .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev));
+            try {
+              if (document.body.classList.contains("stream")) return;
+              this.menu = new El<'div', true>(
+                html[0]
+                  .querySelector(`#chat-log`)!
+                  .cloneNode(false) as unknown as `div#${string}`,
+              )
+                .addClass(this.moduleName)
+                .unset('id')
+                .on("click", (ev) => this.handleMouseEvent(ev))
+                .on("contextmenu" as "click", (ev) => this.handleMouseEvent(ev));
 
-            document.querySelector('body')?.appendChild(tab.element);
+              document.querySelector('body')?.appendChild(this.menu.element);
+            } catch (error) {
+
+            }
           },
         ],
         [
@@ -229,7 +235,8 @@ export class Toasted extends Tome {
   }
 
   protected addMessage(node: ChildNode) {
-    const div = new El(`.${this.moduleName}`);
+    if (!this.ready) return;
+    const div = this.menu;
     if (!div) throw new Error("Chat log not found");
 
     const { messageId } = (node as HTMLElement).dataset;

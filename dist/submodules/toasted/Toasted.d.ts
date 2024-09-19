@@ -1,8 +1,10 @@
+import { El } from "@magik_io/mote";
 import { Tome } from "../../class/Tome";
 export declare class Toasted extends Tome {
     maxMessagesOnScreen: number;
     alwaysShowNotifications: boolean;
     fadeOutDelay: number;
+    menu: El<'div', true> | null;
     constructor(DEBUG?: boolean);
     static expandSidebarInstant(sidebar: HTMLDivElement): void;
     static findTarget(card: HTMLDivElement, event: MouseEvent, messageID: string): {
