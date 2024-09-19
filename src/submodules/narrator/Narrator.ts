@@ -125,40 +125,6 @@ export class Narrator extends Tome {
     super({
       moduleName: "Narrator",
       moduleDescription: "An extremely customizable on screen narrator system",
-      settings: {
-        globalSettings: [
-          {
-            name: "Title Font",
-            hint: "The font used for the title text",
-            type: String,
-            defaultValue: "GhostTheory2",
-            choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
-            onChange: (value) => {
-              Narrator.titleFont = value as typeof Narrator['fonts'][number];
-            }
-          },
-          {
-            name: "Text Font",
-            hint: "The font used for the text body",
-            type: String,
-            defaultValue: "GhostTheory2",
-            choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
-            onChange: (value) => {
-              Narrator.textFont = value as typeof Narrator['fonts'][number];
-            }
-          },
-          {
-            name: "Title Weight",
-            hint: "The weight of the title font",
-            type: String,
-            defaultValue: "400",
-            choices: Object.fromEntries(Narrator.fontWeights.map((weight) => [weight, weight])),
-            onChange: (value) => {
-              Narrator.titleWeight = value as typeof Narrator['fontWeights'][number];
-            }
-          }
-        ]
-      },
       hooks: new Map([
         ['ready', (app, data) => {
           // Load some essential fonts we use in PIXI
@@ -189,5 +155,32 @@ export class Narrator extends Tome {
       socketFns: new Map([]),
       DEBUG
     })
+
+    this.registerSettings([
+      {
+        name: "Title Font",
+        hint: "The font used for the title text",
+        type: String,
+        scope: 'world',
+        defaultValue: "GhostTheory2",
+        choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
+      },
+      {
+        name: "Text Font",
+        hint: "The font used for the text body",
+        type: String,
+        scope: 'world',
+        defaultValue: "GhostTheory2",
+        choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
+      },
+      {
+        name: "Title Weight",
+        hint: "The weight of the title font",
+        type: String,
+        scope: 'world',
+        defaultValue: "400",
+        choices: Object.fromEntries(Narrator.fontWeights.map((weight) => [weight, weight])),
+      }
+    ]);
   }
 }
