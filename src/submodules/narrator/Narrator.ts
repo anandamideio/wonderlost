@@ -93,7 +93,7 @@ export class Narrator extends Tome {
     return this.getSetting<typeof Narrator['fonts'][number]>("Title Font") ?? "GhostTheory2";
   }
   public static get titleFont() {
-    return game.settings?.get('wonderlost', 'narrator-title-font') as typeof Narrator['fonts'][number]
+    return game.settings?.get('wonderlost', Tome.kabob('narrator-Title Font')) as typeof Narrator['fonts'][number]
       ?? "GhostTheory2" as typeof Narrator['fonts'][number];
   }
   public static set titleFont(value: typeof Narrator['fonts'][number]) {
@@ -104,7 +104,7 @@ export class Narrator extends Tome {
     return this.getSetting<typeof Narrator['fonts'][number]>("Text Font") ?? "GhostTheory2";
   }
   public static get textFont() {
-    return game.settings?.get('wonderlost', 'narrator-text-font') as typeof Narrator['fonts'][number]
+    return game.settings?.get('wonderlost', Tome.kabob('narrator-Text Font')) as typeof Narrator['fonts'][number]
       ?? "GhostTheory2";
   }
   public static set textFont(value: typeof Narrator['fonts'][number]) {
@@ -115,7 +115,7 @@ export class Narrator extends Tome {
     return this.getSetting<typeof Narrator['fontWeights'][number]>("Title Weight") ?? "400";
   }
   public static get titleWeight() {
-    return game.settings?.get('wonderlost', 'narrator-title-weight') as typeof Narrator['fontWeights'][number]
+    return game.settings?.get('wonderlost', Tome.kabob('narrator-Title Weight')) as typeof Narrator['fontWeights'][number]
       ?? "400";
   }
   public static set titleWeight(value: typeof Narrator['fontWeights'][number]) {
