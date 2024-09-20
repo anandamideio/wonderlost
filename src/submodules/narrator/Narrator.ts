@@ -1,3 +1,4 @@
+import consola from 'consola';
 import { Tome } from 'src/class/Tome';
 import { FontsLoader } from 'src/modules/fontLoader/FontLoader';
 
@@ -126,30 +127,32 @@ export class Narrator extends Tome {
       moduleName: "Narrator",
       moduleDescription: "An extremely customizable on screen narrator system",
       hooks: new Map([
-        ['ready', (app, data) => {
+        ['ready', async (app, data) => {
           // Load some essential fonts we use in PIXI
-          FontsLoader({
+          await FontsLoader({
             custom: {
               families: [Narrator.titleFont, Narrator.textFont],
             },
           });
-          // async load everything else
-          let oFonts = [];
-          for (let idx = Narrator.fonts.length - 1; idx >= 0; --idx) {
-            if (Narrator.fonts[idx] === Narrator.titleFont || Narrator.fonts[idx] === Narrator.textFont) {
-              continue;
-            }
-            oFonts.push(Narrator.fonts[idx]);
+
+          if (this.DEBUG) {
+            consola.success(`${this.moduleName} | Fonts loaded`, this);
           }
-          const aLoader = async function (fonts: string[]) {
-            FontsLoader({
+
+          const otherFonts = Narrator.fonts.filter(font =>
+            font !== Narrator.titleFont && font !== Narrator.textFont
+          );
+          // Define a reusable font loading function
+          const loadFonts = async (fonts: string[]): Promise<void> => {
+            await FontsLoader({
               custom: {
                 families: fonts,
               },
             });
           };
 
-          aLoader(oFonts);
+          // Load other fonts asynchronously
+          await loadFonts(otherFonts);
         }]
       ]),
       socketFns: new Map([]),
@@ -162,6 +165,8 @@ export class Narrator extends Tome {
         hint: "The font used for the title text",
         type: String,
         scope: 'world',
+
+        restricted: false,
         defaultValue: "GhostTheory2",
         choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
       },
@@ -170,6 +175,8 @@ export class Narrator extends Tome {
         hint: "The font used for the text body",
         type: String,
         scope: 'world',
+
+        restricted: false,
         defaultValue: "GhostTheory2",
         choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
       },
@@ -178,6 +185,8 @@ export class Narrator extends Tome {
         hint: "The weight of the title font",
         type: String,
         scope: 'world',
+
+        restricted: false,
         defaultValue: "400",
         choices: Object.fromEntries(Narrator.fontWeights.map((weight) => [weight, weight])),
       }
