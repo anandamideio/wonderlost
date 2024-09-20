@@ -18,7 +18,7 @@ export class Toasted extends Tome {
       moduleDescription: "A customizable toast notification system",
       hooks: new Map([
         [
-          "ready",
+          "renderChatLog",
           async (app, html) => {
             try {
               if (document.body.classList.contains("stream")) return;
