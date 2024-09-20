@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A FVTT module add features from the Wondershade system to the PF2e game system",
   "scripts": {
-    "build": "rm -rf dist && rollup -c && sed -E 's|/scripts\/greensock\/esm\/all\\.js|../../../scripts\/greensock\/esm\/all\\.js|g' dist/wonderlost.mjs > dist/wonderlost.tmp && mv dist/wonderlost.tmp dist/wonderlost.mjs",
+    "build": "rm -rf dist && rollup -c && sed -E 's|/scripts/greensock/esm/all\\.js|../../../scripts/greensock/esm/all\\.js|g' dist/wonderlost.mjs > dist/wonderlost.tmp && mv dist/wonderlost.tmp dist/wonderlost.mjs",
     "clean": "rm -rf dist",
     "lint": "eslint .",
     "test": "vitest run --coverage --config ./vitest.config.ts",
@@ -50,6 +50,7 @@
     "@types/node": "^22.5.5",
     "eslint": "^9.10.0",
     "gsap": "^3.12.5",
+    "pixi.js": "^8.4.1",
     "rollup": "^4.21.3",
     "tslib": "^2.7.0",
     "typescript-eslint": "^8.6.0"

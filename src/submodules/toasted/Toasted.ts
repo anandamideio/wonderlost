@@ -277,13 +277,22 @@ export class Toasted extends Tome {
   }
 
   protected removeMessage(node: ChildNode, { time = 0.3, delay = this.fadeOutDelay } = {}) {
-    if (this.fadeOutDelay < 0) return;
+    if (!this.ready) return;
+    if (this.DEBUG) {
+      consola.info(`${this.moduleName} | Removing message`, { node, time, delay });
+    }
 
     TweenMax.to(node, time, {
       opacity: 0,
       height: 0,
       delay,
-      onComplete: () => { node.remove(); },
+      onComplete: () => {
+        if (this.DEBUG) consola.start(`${this.moduleName} | Message animation finished`, node);
+
+        node.remove();
+
+        if (this.DEBUG) consola.success(`${this.moduleName} | Message removed`, node);
+      },
     });
   }
 
