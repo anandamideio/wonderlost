@@ -282,18 +282,22 @@ export class Toasted extends Tome {
       consola.info(`${this.moduleName} | Removing message`, { node, time, delay });
     }
 
-    TweenMax.to(node, time, {
-      opacity: 0,
-      height: 0,
-      delay,
-      onComplete: () => {
-        if (this.DEBUG) consola.start(`${this.moduleName} | Message animation finished`, node);
+    setTimeout(() => {
+      node.remove();
+    }, delay);
 
-        node.remove();
+    // TweenMax.to(node, time, {
+    //   opacity: 0,
+    //   height: 0,
+    //   delay,
+    //   onComplete: () => {
+    //     if (this.DEBUG) consola.start(`${this.moduleName} | Message animation finished`, node);
 
-        if (this.DEBUG) consola.success(`${this.moduleName} | Message removed`, node);
-      },
-    });
+    //     node.remove();
+
+    //     if (this.DEBUG) consola.success(`${this.moduleName} | Message removed`, node);
+    //   },
+    // });
   }
 
   protected updateMessage(newNode: ChildNode, oldNode: Node) {
