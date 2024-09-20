@@ -238,45 +238,10 @@ export class Narrator extends Tome {
     super({
       moduleName: "Narrator",
       moduleDescription: "An extremely customizable on screen narrator system",
-      hooks: new Map([
-        ['ready', async (app, data) => {
-
-          await this.setup();
-          // Load some essential fonts we use in PIXI
-          await FontsLoader({
-            custom: {
-              families: [Narrator.titleFont, Narrator.textFont],
-            },
-          });
-
-          if (this.DEBUG) {
-            consola.success(`${this.moduleName} | Fonts loaded`, this);
-          }
-
-          const otherFonts = Narrator.fonts.filter(font =>
-            font !== Narrator.titleFont && font !== Narrator.textFont
-          );
-          // Define a reusable font loading function
-          const loadFonts = async (fonts: string[]): Promise<void> => {
-            await FontsLoader({
-              custom: {
-                families: fonts,
-              },
-            });
-          };
-
-          // Load other fonts asynchronously
-          await loadFonts(otherFonts);
-        },
-          [
-            'renderScene', async (app, data) => {
-              if (this.ready) {
-                this.render()
-              }
-            }
-          ]
-        ]
-      ]),
+      // hooks: new Map([
+      //   ['ready', async () => { await this.setup(); }],
+      //   ['renderScene', async () => { if (this.ready) { this.render() } }]
+      // ]),
       socketFns: new Map([]),
       DEBUG
     })
