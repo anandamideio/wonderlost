@@ -20,13 +20,27 @@ export class Toasted extends Tome {
         [
           "renderChatLog",
           async (app, html) => {
-            if (DEBUG){ consola.info("Toasted | Render chat log", { app, html });}
+            if (DEBUG){
+              consola.info("Toasted | Render chat log", { app, html });
+            }
+
+            const firstElementChild = html[0]
+            if (!firstElementChild) {
+              consola.error("Toasted | Render chat log failed", { app, html });
+              return;
+            }
+
+            const chatLog = firstElementChild.querySelector("#chat-log");
+            if (!chatLog) {
+              consola.error("Toasted | Chat log not found", { app, html });
+              return;
+            }
+
+            if (document.body.classList.contains("stream")) return;
+
             try {
-              if (document.body.classList.contains("stream")) return;
               const div = new El<'div', true>(
-                html[0]
-                  .querySelector('#chat-log')
-                  .cloneNode(false) as unknown as `div#${string}`,
+                chatLog.cloneNode(false) as unknown as `div#${string}`,
               )
                 .addClass(this.moduleName)
                 .id(this.lowercaseName)
@@ -40,7 +54,8 @@ export class Toasted extends Tome {
 
               if (this.DEBUG) consola.success(`${this.moduleName} | Chat log rendered`);
             } catch (error) {
-
+              consola.error("Toasted | Error rendering chat log", { error });
+              this.ready = false;
             }
           },
         ],
