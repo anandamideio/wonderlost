@@ -1,6 +1,7 @@
 import { El } from "@magik_io/mote";
 import consola from 'consola';
 import { Tome } from "../../class/Tome";
+// @ts-ignore
 import { TweenMax } from "/scripts/greensock/esm/all.js";
 
 export class Toasted extends Tome {
@@ -39,6 +40,11 @@ export class Toasted extends Tome {
             if (document.body.classList.contains("stream")) return;
 
             try {
+              if (this.ToastedReady) {
+                consola.warn("Toasted | Chat log already rendered");
+                return;
+              }
+
               const div = new El<'div', true>(
                 chatLog.cloneNode(false) as unknown as `div#${string}`,
               )
@@ -163,6 +169,7 @@ export class Toasted extends Tome {
     messageID: string,
   ) {
     const cardRect = card.getBoundingClientRect();
+    const targetByName = document.querySelector(`.${this.name}`);
     const popupRect = document
       .querySelector(`.${this.name}`)!
       .getBoundingClientRect();
@@ -252,7 +259,7 @@ export class Toasted extends Tome {
     }
 
     const sidebar = tabBtn?.closest("#sidebar");
-    if (sidebar && sidebar?.classList.contains("collapsed")) {
+    if (sidebar?.classList.contains("collapsed")) {
       Toasted.expandSidebarInstant(sidebar as HTMLDivElement);
     }
     this.delegateEvent(node, ev);
