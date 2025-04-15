@@ -95,6 +95,16 @@ export declare abstract class Tome {
     initialize(): this;
     static expandObject(value: unknown): Record<string, unknown>;
     static kabob(str: string): string;
+    toJSON(): {
+        moduleName: string;
+        moduleDescription: string;
+        settings: (Rules & {
+            scope: "world" | "client";
+        })[];
+        hooks: Map<HookableEvents, HookEvent>;
+        socketFns: Map<string, (data: unknown) => void>;
+        DEBUG: boolean | undefined;
+    };
 }
 export {};
 //# sourceMappingURL=Tome.d.ts.map
