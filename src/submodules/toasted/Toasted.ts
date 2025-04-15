@@ -20,6 +20,7 @@ export class Toasted extends Tome {
         [
           "renderChatLog",
           async (app, html) => {
+            if (DEBUG){ consola.info("Toasted | Render chat log", { app, html });}
             try {
               if (document.body.classList.contains("stream")) return;
               const div = new El<'div', true>(
