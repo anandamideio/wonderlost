@@ -66,333 +66,344 @@ interface TomeRuleConstructor {
 }
 
 export abstract class Tome {
-	public moduleName: string;
-	public moduleDescription: string;
-	public settings: Array<Rules & { scope: "world" | "client" }> = [];
-	public hooks = new Map([] as Array<[HookableEvents, HookEvent]>);
-	public socketFns: Map<string, (data: unknown) => void> = new Map();
-	public DEBUG?: boolean = false;
-	public ready = false;
+		public moduleName: string;
+		public moduleDescription: string;
+		public settings: Array<Rules & { scope: "world" | "client" }> = [];
+		public hooks = new Map([] as Array<[HookableEvents, HookEvent]>);
+		public socketFns: Map<string, (data: unknown) => void> = new Map();
+		public DEBUG?: boolean = false;
+		public ready = false;
 
-	get name() {
-		return this.moduleName;
-	}
+		get name() {
+			return this.moduleName;
+		}
 
-	get lowercaseName() {
-		return this.moduleName.toLowerCase();
-	}
+		get lowercaseName() {
+			return this.moduleName.toLowerCase();
+		}
 
-	get hasHooks() {
-		return this.hooks.size > 0;
-	}
+		get hasHooks() {
+			return this.hooks.size > 0;
+		}
 
-	get hasSettings() {
-		return this.settings.length > 0;
-	}
+		get hasSettings() {
+			return this.settings.length > 0;
+		}
 
-	get hasSocketFns() {
-		return this.socketFns.size > 0;
-	}
+		get hasSocketFns() {
+			return this.socketFns.size > 0;
+		}
 
-	get needsEarlyInitialization() {
-		return (
-			this.hasSettings ||
-			(this.hasHooks && this.hooks.has("init")) ||
-			(this.hasHooks && this.hooks.has("ready")) ||
-			this.hasSocketFns
-		);
-	}
-
-	constructor(
-		pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
-			settings?: TomeRuleConstructor;
-			hooks?: Tome["hooks"];
-			socketFns?: Tome["socketFns"];
-			DEBUG?: boolean;
-		},
-	) {
-		this.moduleName = pTome.moduleName;
-		this.moduleDescription = pTome.moduleDescription;
-		if (pTome?.settings) {
-			this.settings =
-				pTome.settings.globalSettings?.map((s) => {
-					s.scope = "world";
-					return s as Rules & { scope: "world" };
-				}) ?? [];
-
-			this.settings.push(
-				...(pTome.settings.clientSettings?.map((s) => {
-					s.scope = "client";
-					return s as Rules & { scope: "client" };
-				}) ?? []),
+		get needsEarlyInitialization() {
+			return (
+				this.hasSettings ||
+				(this.hasHooks && this.hooks.has("init")) ||
+				(this.hasHooks && this.hooks.has("ready")) ||
+				this.hasSocketFns
 			);
 		}
 
-		this.hooks = pTome?.hooks ?? new Map();
-		this.socketFns = pTome?.socketFns ?? new Map();
-		this.DEBUG = pTome?.DEBUG ?? false;
-	}
+		constructor(
+			pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
+				settings?: TomeRuleConstructor;
+				hooks?: Tome["hooks"];
+				socketFns?: Tome["socketFns"];
+				DEBUG?: boolean;
+			},
+		) {
+			this.moduleName = pTome.moduleName;
+			this.moduleDescription = pTome.moduleDescription;
+			if (pTome?.settings) {
+				this.settings =
+					pTome.settings.globalSettings?.map((s) => {
+						s.scope = "world";
+						return s as Rules & { scope: "world" };
+					}) ?? [];
 
-	public addHook(
-		event: HookableEvents,
-		callback: HookEvent,
-		overwrite = false,
-	) {
-		if (!this.hooks.has(event) || overwrite) {
-			this.hooks.set(event, callback);
-		} else {
-			consola.warn(`Hook for event "${event}" already exists.`);
-		}
-	}
-
-	public initializeHooks() {
-		this.hooks.forEach((callback, event) => {
-			if (this.DEBUG) {
-				consola.box({
-					title: `[TOME::${this.moduleName}] => Registering hook for ${event}`,
-					additional: { callback: callback.toString() },
-				});
+				this.settings.push(
+					...(pTome.settings.clientSettings?.map((s) => {
+						s.scope = "client";
+						return s as Rules & { scope: "client" };
+					}) ?? []),
+				);
 			}
 
-			Hooks.on(event, callback);
-		});
-
-		return this;
-	}
-
-	// Method to register global settings
-	public registerSetting(rule: Rules & { scope: "world" | "client" }): Tome {
-		switch (rule.type) {
-			case Number:
-				this.settings.push({ ...rule } as NumberRule & {
-					scope: "world" | "client";
-				});
-				break;
-			case Boolean:
-				this.settings.push({ ...rule } as BooleanRule & {
-					scope: "world" | "client";
-				});
-				break;
-			case String:
-				this.settings.push({ ...rule } as StringRule & {
-					scope: "world" | "client";
-				});
-				break;
-			case Object:
-				this.settings.push({ ...rule } as ObjectRule & {
-					scope: "world" | "client";
-				});
-				break;
-			case Array:
-				this.settings.push({ ...rule } as ArrayRule & {
-					scope: "world" | "client";
-				});
-				break;
-			case Color:
-				this.settings.push({ ...rule } as ColorRule & {
-					scope: "world" | "client";
-				});
-				break;
-			default:
-				throw new Error(`Unsupported rule type: ${rule.type}`);
+			this.hooks = pTome?.hooks ?? new Map();
+			this.socketFns = pTome?.socketFns ?? new Map();
+			this.DEBUG = pTome?.DEBUG ?? false;
 		}
 
-		return this;
-	}
+		public addHook(
+			event: HookableEvents,
+			callback: HookEvent,
+			overwrite = false,
+		) {
+			if (!this.hooks.has(event) || overwrite) {
+				this.hooks.set(event, callback);
+			} else {
+				consola.warn(`Hook for event "${event}" already exists.`);
+			}
+		}
 
-	public registerSettings(
-		rules: Array<Rules & { scope: "world" | "client" }>,
-	): Tome {
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		rules.forEach((rule) => {
-			this.registerSetting(rule);
-		});
-		return this;
-	}
+		public initializeHooks() {
+			this.hooks.forEach((callback, event) => {
+				if (this.DEBUG) {
+					consola.box({
+						title: `[TOME::${this.moduleName}] => Registering hook for ${event}`,
+						additional: { callback: callback.toString() },
+					});
+				}
 
-	public initializeSettings() {
-		// biome-ignore lint/complexity/noForEach: <explanation>
-		this.settings.forEach((setting) => {
-			if (this.DEBUG) {
-				consola.box({
-					title: `[TOME::${this.moduleName}] => Registering ${setting.name}`,
-					additional: { ...setting },
-				});
+				Hooks.on(event, callback);
+			});
+
+			return this;
+		}
+
+		// Method to register global settings
+		public registerSetting(rule: Rules & { scope: "world" | "client" }): Tome {
+			switch (rule.type) {
+				case Number:
+					this.settings.push({ ...rule } as NumberRule & {
+						scope: "world" | "client";
+					});
+					break;
+				case Boolean:
+					this.settings.push({ ...rule } as BooleanRule & {
+						scope: "world" | "client";
+					});
+					break;
+				case String:
+					this.settings.push({ ...rule } as StringRule & {
+						scope: "world" | "client";
+					});
+					break;
+				case Object:
+					this.settings.push({ ...rule } as ObjectRule & {
+						scope: "world" | "client";
+					});
+					break;
+				case Array:
+					this.settings.push({ ...rule } as ArrayRule & {
+						scope: "world" | "client";
+					});
+					break;
+				case Color:
+					this.settings.push({ ...rule } as ColorRule & {
+						scope: "world" | "client";
+					});
+					break;
+				default:
+					throw new Error(`Unsupported rule type: ${rule.type}`);
 			}
 
+			return this;
+		}
+
+		public registerSettings(
+			rules: Array<Rules & { scope: "world" | "client" }>,
+		): Tome {
+			// biome-ignore lint/complexity/noForEach: <explanation>
+			rules.forEach((rule) => {
+				this.registerSetting(rule);
+			});
+			return this;
+		}
+
+		public initializeSettings() {
+			// biome-ignore lint/complexity/noForEach: <explanation>
+			this.settings.forEach((setting) => {
+				if (this.DEBUG) {
+					consola.box({
+						title: `[TOME::${this.moduleName}] => Registering ${setting.name}`,
+						additional: { ...setting },
+					});
+				}
+
+				game.settings?.register(
+					"wonderlost",
+					Tome.kabob(`${this.lowercaseName}-${setting.name}`),
+					{
+						name: setting.name,
+						hint: setting.hint,
+						scope: setting.scope,
+						config: true,
+						default: setting?.defaultValue,
+						// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+						type: setting.type as unknown as DataModel<any, any>,
+						// @ts-ignore -> These are only there when the type is correct, but TS doesn't know that
+						choices: setting?.choices,
+						// @ts-ignore -> Same as above
+						range: setting?.range,
+						onChange: setting.onChange,
+						requiresReload: setting.requiresReload,
+					},
+				);
+			});
+
+			return this;
+		}
+
+		// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+		public getSetting<ExpectedReturn = any>(settingName: string) {
+			return game.settings?.get(
+				"wonderlost",
+				Tome.kabob(`${this.lowercaseName}-${settingName}`),
+			) as ExpectedReturn;
+		}
+
+		public async setSetting(settingName: string, value: unknown) {
+			return game.settings?.set(
+				"wonderlost",
+				Tome.kabob(`${this.lowercaseName}-${settingName}`),
+				value,
+			);
+		}
+
+		public registerSettingSubmenu<
+			Data extends Record<string, unknown> = Record<string, unknown>,
+		>(menu: RuleMenu & { data: Data }) {
 			game.settings?.register(
 				"wonderlost",
-				Tome.kabob(`${this.lowercaseName}-${setting.name}`),
+				Tome.kabob(`${this.lowercaseName}-allSettings`),
 				{
-					name: setting.name,
-					hint: setting.hint,
-					scope: setting.scope,
-					config: true,
-					default: setting?.defaultValue,
+					scope: "world",
+					config: false,
 					// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-					type: setting.type as unknown as DataModel<any, any>,
-					// @ts-ignore -> These are only there when the type is correct, but TS doesn't know that
-					choices: setting?.choices,
-					// @ts-ignore -> Same as above
-					range: setting?.range,
-					onChange: setting.onChange,
-					requiresReload: setting.requiresReload,
+					type: Object as unknown as DataModel<any, any>,
+					default: menu.data,
 				},
 			);
-		});
 
-		return this;
-	}
+			const lowercaseName = `${this.lowercaseName}`;
+			const moduleName = this.moduleName.toString();
 
-	// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-	public getSetting<ExpectedReturn = any>(settingName: string) {
-		return game.settings?.get(
-			"wonderlost",
-			Tome.kabob(`${this.lowercaseName}-${settingName}`),
-		) as ExpectedReturn;
-	}
+			game.settings?.registerMenu(
+				"wonderlost",
+				Tome.kabob(`${this.lowercaseName}-allSettings`),
+				{
+					name: menu.name,
+					label: menu.label,
+					hint: menu.hint,
+					icon: menu.icon,
+					restricted: menu.restricted,
+					// @ts-ignore
+					type: class extends FormApplication {
+						constructor() {
+							super({});
+						}
 
-	public async setSetting(settingName: string, value: unknown) {
-		return game.settings?.set(
-			"wonderlost",
-			Tome.kabob(`${this.lowercaseName}-${settingName}`),
-			value,
-		);
-	}
+						static get defaultOptions() {
+							// biome-ignore lint/complexity/noThisInStatic: <explanation>
+							return foundry.utils.mergeObject(super.defaultOptions, {
+								title: `Wonderlost: ${moduleName}`,
+								id: `${moduleName}-settings`,
+								width: 550,
+								height: "auto",
+								popOut: true,
+								closeOnSubmit: true as boolean,
+								template: `modules/wonderlost/submodules/${lowercaseName}/settings.hbs`,
+							});
+						}
 
-	public registerSettingSubmenu<
-		Data extends Record<string, unknown> = Record<string, unknown>,
-	>(menu: RuleMenu & { data: Data }) {
-		game.settings?.register(
-			"wonderlost",
-			Tome.kabob(`${this.lowercaseName}-allSettings`),
-			{
-				scope: "world",
-				config: false,
-				// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-				type: Object as unknown as DataModel<any, any>,
-				default: menu.data,
-			},
-		);
+						static get moduleName() {
+							return moduleName;
+						}
 
-		const lowercaseName = `${this.lowercaseName}`;
-		const moduleName = this.moduleName.toString();
-
-		game.settings?.registerMenu(
-			"wonderlost",
-			Tome.kabob(`${this.lowercaseName}-allSettings`),
-			{
-				name: menu.name,
-				label: menu.label,
-				hint: menu.hint,
-				icon: menu.icon,
-				restricted: menu.restricted,
-				// @ts-ignore
-				type: class extends FormApplication {
-					constructor() {
-						super({});
-					}
-
-					static get defaultOptions() {
-						// biome-ignore lint/complexity/noThisInStatic: <explanation>
-						return foundry.utils.mergeObject(super.defaultOptions, {
-							title: `Wonderlost: ${moduleName}`,
-							id: `${moduleName}-settings`,
-							width: 550,
-							height: "auto",
-							popOut: true,
-							closeOnSubmit: true as boolean,
-							template: `modules/wonderlost/submodules/${lowercaseName}/settings.hbs`,
-						});
-					}
-
-					static get moduleName() {
-						return moduleName;
-					}
-
-					getData() {
-						return foundry.utils.isEmpty(
-							game.settings?.get(
-								moduleName,
-								`${moduleName.toLowerCase()}-allSettings`,
-								// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-							) as any,
-						)
-							? (game.settings?.get(
+						getData() {
+							return foundry.utils.isEmpty(
+								game.settings?.get(
 									moduleName,
 									`${moduleName.toLowerCase()}-allSettings`,
-								) as MaybePromise<Data>)
-							: (menu.data as MaybePromise<Data>);
-					}
-
-					async _updateObject(_event: Event, formData: Data) {
-						await game.settings?.set(
-							moduleName,
-							`${moduleName.toLowerCase()}-allSettings`,
-							formData,
-						);
-					}
-				},
-			},
-		);
-	}
-
-	public initializeSocketListeners() {
-		if (this.socketFns.size === 0) return this;
-
-		this.socketFns.forEach((fn, event) => {
-			if (this.DEBUG) {
-				consola.info(`Registering socket listener for event: ${event}`);
-			}
-
-			game.socket?.on(event, (data: unknown) => fn(data));
-		});
-
-		return this;
-	}
-
-	public initialize() {
-		if (this.hasSettings) {
-			this.initializeSettings();
-		}
-
-		if (this.hasHooks) {
-			this.initializeHooks();
-		}
-
-		if (this.hasSocketFns) {
-			this.initializeSocketListeners();
-		}
-
-		this.ready = true;
-
-		return this;
-	}
-
-	// Utility function to expand object rules
-	static expandObject(value: unknown): Record<string, unknown> {
-		if (typeof value === "object" && value !== null) {
-			return Object.entries(value).reduce(
-				(acc, [key, val]) => {
-					if (typeof val === "string") {
-						try {
-							acc[key] = JSON.parse(val);
-						} catch (e) {
-							acc[key] = val;
+									// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+								) as any,
+							)
+								? (game.settings?.get(
+										moduleName,
+										`${moduleName.toLowerCase()}-allSettings`,
+									) as MaybePromise<Data>)
+								: (menu.data as MaybePromise<Data>);
 						}
-					} else {
-						acc[key] = val;
-					}
-					return acc;
+
+						async _updateObject(_event: Event, formData: Data) {
+							await game.settings?.set(
+								moduleName,
+								`${moduleName.toLowerCase()}-allSettings`,
+								formData,
+							);
+						}
+					},
 				},
-				{} as Record<string, unknown>,
 			);
 		}
-		throw new Error(`Expected object but received ${typeof value}`);
-	}
 
-	static kabob(str: string) {
-		if (!str) return "";
-		return str.split("").join("-");
+		public initializeSocketListeners() {
+			if (this.socketFns.size === 0) return this;
+
+			this.socketFns.forEach((fn, event) => {
+				if (this.DEBUG) {
+					consola.info(`Registering socket listener for event: ${event}`);
+				}
+
+				game.socket?.on(event, (data: unknown) => fn(data));
+			});
+
+			return this;
+		}
+
+		public initialize() {
+			if (this.hasSettings) {
+				this.initializeSettings();
+			}
+
+			if (this.hasHooks) {
+				this.initializeHooks();
+			}
+
+			if (this.hasSocketFns) {
+				this.initializeSocketListeners();
+			}
+
+			this.ready = true;
+
+			return this;
+		}
+
+		// Utility function to expand object rules
+		static expandObject(value: unknown): Record<string, unknown> {
+			if (typeof value === "object" && value !== null) {
+				return Object.entries(value).reduce(
+					(acc, [key, val]) => {
+						if (typeof val === "string") {
+							try {
+								acc[key] = JSON.parse(val);
+							} catch (e) {
+								acc[key] = val;
+							}
+						} else {
+							acc[key] = val;
+						}
+						return acc;
+					},
+					{} as Record<string, unknown>,
+				);
+			}
+			throw new Error(`Expected object but received ${typeof value}`);
+		}
+
+		static kabob(str: string) {
+			if (!str) return "";
+			return str.split("").join("-");
+		}
+
+		toJSON() {
+			return {
+				moduleName: this.moduleName,
+				moduleDescription: this.moduleDescription,
+				settings: this.settings,
+				hooks: this.hooks,
+				socketFns: this.socketFns,
+				DEBUG: this.DEBUG,
+			};
+		}
 	}
-}

@@ -17,7 +17,7 @@ class Wonderlost {
 	constructor(public DEBUG = false) {
 		this.DEBUG = DEBUG;
 		if (this.DEBUG) {
-			consola.info("Wonderlost | Initialized", this);
+			consola.info("Wonderlost | Initialized", { self: this });
 		}
 	}
 
@@ -26,7 +26,9 @@ class Wonderlost {
 			new Tome(this.DEBUG).initialize();
 
 			if (this.DEBUG) {
-				consola.info(`Wonderlost | Initialized ${tomeName}`, Tome);
+				consola.info(`Wonderlost | Initialized ${tomeName}`, {
+					Tome: Tome.prototype.toJSON(),
+				});
 			}
 		}
 	}
