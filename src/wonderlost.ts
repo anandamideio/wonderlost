@@ -32,7 +32,7 @@ class Wonderlost {
 	}
 }
 
-Hooks.once("ready", async () => {
+Hooks.once("setup", async () => {
 	consola.start("Wonderlost | Initialized");
 	new Wonderlost(true).initializeTomes();
 	consola.success("Wonderlost | Ready");
