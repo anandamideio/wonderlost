@@ -27,10 +27,10 @@ class Wonderlost {
   }
 }
 
-Hooks.once("init", async function () {
-  consola.start("Wonderlost | Initialized");
-  new Wonderlost(true).initializeTomes();
-  consola.success("Wonderlost | Ready");
+Hooks.once("init", async () => {
+	consola.start("Wonderlost | Initialized");
+	new Wonderlost(true).initializeTomes();
+	consola.success("Wonderlost | Ready");
 });
 
 // Hooks.once("ready", async function () { });

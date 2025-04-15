@@ -24,7 +24,7 @@ export class Toasted extends Tome {
               if (document.body.classList.contains("stream")) return;
               const div = new El<'div', true>(
                 html[0]
-                  .querySelector(`#chat-log`)!
+                  .querySelector('#chat-log')
                   .cloneNode(false) as unknown as `div#${string}`,
               )
                 .addClass(this.moduleName)

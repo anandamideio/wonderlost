@@ -231,8 +231,8 @@ export class Narrator extends Tome {
     game.settings?.set('wonderlost', 'narrator-title-weight', value);
   }
 
-  private canvas: HTMLCanvasElement;
-  private stage: PIXI.Application;
+  private canvas?: HTMLCanvasElement;
+  private stage?: PIXI.Application;
 
   constructor(DEBUG = false) {
     super({
