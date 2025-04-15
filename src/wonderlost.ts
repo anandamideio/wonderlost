@@ -6,28 +6,33 @@ type ToastedTuple = ['Toasted', typeof Toasted];
 type NarratorTuple = ['Narrator', typeof Narrator];
 
 class Wonderlost {
-  public tomes = new Map<'Toasted' | 'Narrator', typeof Toasted | typeof Narrator>([
-    ['Toasted', Toasted] as ToastedTuple,
-    ['Narrator', Narrator] as NarratorTuple,
-  ])
+	public tomes = new Map<
+		"Toasted" | "Narrator",
+		typeof Toasted | typeof Narrator
+	>([
+		["Toasted", Toasted] as ToastedTuple,
+		["Narrator", Narrator] as NarratorTuple,
+	]);
 
-  constructor(public DEBUG = false) {
-    this.DEBUG = DEBUG;
-    consola.info("Wonderlost | Initialized", this);
-  }
+	constructor(public DEBUG = false) {
+		this.DEBUG = DEBUG;
+		if (this.DEBUG) {
+			consola.info("Wonderlost | Initialized", this);
+		}
+	}
 
-  initializeTomes() {
-    for (const [tomeName, tome] of this.tomes) {
-      new tome(this.DEBUG).initialize();
+	initializeTomes() {
+		for (const [tomeName, Tome] of this.tomes) {
+			new Tome(this.DEBUG).initialize();
 
-      if (this.DEBUG) {
-        consola.info(`Wonderlost | Initialized ${tomeName}`, tome);
-      }
-    }
-  }
+			if (this.DEBUG) {
+				consola.info(`Wonderlost | Initialized ${tomeName}`, Tome);
+			}
+		}
+	}
 }
 
-Hooks.once("init", async () => {
+Hooks.once("ready", async () => {
 	consola.start("Wonderlost | Initialized");
 	new Wonderlost(true).initializeTomes();
 	consola.success("Wonderlost | Ready");

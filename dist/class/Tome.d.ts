@@ -1,6 +1,6 @@
-type CoreLifeCycleHooks = 'init' | 'ready' | 'error' | 'setup' | 'i18nInit';
-type HookableEvents = "renderChatLog" | "renderChatMessage" | 'renderApplication' | CoreLifeCycleHooks;
-type HookEvent = (app: Application, html: JQuery, data?: any) => void | Promise<void>;
+type CoreLifeCycleHooks = "init" | "ready" | "error" | "setup" | "i18nInit";
+type HookableEvents = "renderChatLog" | "renderChatMessage" | "renderApplication" | CoreLifeCycleHooks;
+type HookEvent = (app: Application, html: JQuery, data?: Record<string, unknown>) => void | Promise<void>;
 interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {
 }
 interface Rule {
@@ -88,7 +88,7 @@ export declare abstract class Tome {
     initializeSettings(): this;
     getSetting<ExpectedReturn = any>(settingName: string): ExpectedReturn;
     setSetting(settingName: string, value: unknown): Promise<unknown>;
-    registerSettingSubmenu<Data extends Record<string, any> = Record<string, any>>(menu: RuleMenu & {
+    registerSettingSubmenu<Data extends Record<string, unknown> = Record<string, unknown>>(menu: RuleMenu & {
         data: Data;
     }): void;
     initializeSocketListeners(): this;
