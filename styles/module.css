@@ -8,7 +8,7 @@
   flex-flow: var(--direction) nowrap;
   width: 300px;
   height: auto;
-  left: var(--left);
+  /* left: var(--left); */
   z-index: 9999;
   overflow: hidden;
   opacity: var(--opacity);
