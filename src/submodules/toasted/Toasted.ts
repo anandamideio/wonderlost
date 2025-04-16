@@ -31,7 +31,7 @@ export class Toasted extends Tome {
               return;
             }
 
-            const chatLog = firstElementChild.querySelector("#chat-log");
+            const chatLog = firstElementChild.querySelector("#chat-log") as HTMLDivElement;
             if (!chatLog) {
               consola.error("Toasted | Chat log not found", { app, html });
               return;
@@ -78,21 +78,34 @@ export class Toasted extends Tome {
         [
           "module.toasted",
           (data) => {
+            let toast: {
+              element: HTMLDivElement;
+              close: () => void;
+            } | undefined;
+
             if (this.alwaysShowNotifications) {
-              ui.notifications?.info(data);
+              toast = ui.notifications?.info(data);
+
+              if (this.DEBUG) {
+                consola.info("Toasted | Show notification", { data });
+              }
+
+
               return;
+            }
+            if (!this.alwaysShowNotifications && ui.chat.element.isVisible() === false) {
+              toast = ui.notifications?.info(data);
             }
 
             consola.info(data);
 
-            // this.toasts.push(data);
             // if (this.toasts.length > this.maxMessagesOnScreen) this.toasts.shift();
 
             // const toast = ui.notifications?.info(data);
-            // toast?.element.addEventListener("click", () => {
-            //   this.toasts.shift();
-            //   toast.close();
-            // });
+            toast?.element.addEventListener("click", () => {
+              // this.toasts.shift();
+              toast.close();
+            });
           },
         ]
       ]),
