@@ -4,11 +4,22 @@ import { Tome } from '../../class/Tome';
 // @ts-ignore
 import { TweenMax } from '/scripts/greensock/esm/all.js';
 
+type ToastPosition = 
+  | 'upperLeft' 
+  | 'upperCenter' 
+  | 'upperRight' 
+  | 'middleLeft' 
+  | 'middleCenter' 
+  | 'middleRight'
+  | 'lowerLeft'
+  | 'lowerCenter'
+  | 'lowerRight';
+
 export class Toasted extends Tome {
   public maxMessagesOnScreen = 5;
   public alwaysShowNotifications = true;
   public fadeOutDelay = 3000;
-
+  public toastPosition: ToastPosition = 'upperLeft';
   public ToastedReady = false;
 
   public menu: El<'div', true> | null = null;
@@ -47,6 +58,7 @@ export class Toasted extends Tome {
 
               const div = new El<'div', true>(chatLog.cloneNode(false) as unknown as `div#${string}`)
                 .addClass(this.moduleName)
+                .addClass(this.toastPosition.replace(/([A-Z])/g, '-$1').toLowerCase())
                 .id(this.lowercaseName)
                 .on('click', (ev) => this.handleMouseEvent(ev))
                 .on('contextmenu' as 'click', (ev) => this.handleMouseEvent(ev));
@@ -110,6 +122,9 @@ export class Toasted extends Tome {
           },
         ],
       ]),
+      stylesheets: [
+        'toasted.css'
+      ],
       DEBUG,
     });
 
@@ -149,7 +164,49 @@ export class Toasted extends Tome {
           this.alwaysShowNotifications = Boolean(value);
         },
       },
+      {
+        name: 'Toast Position',
+        hint: 'Where would you like toast notifications to appear on screen?',
+        type: String,
+        defaultValue: this.toastPosition,
+        choices: {
+          'upperLeft': 'Upper Left',
+          'upperCenter': 'Upper Center',
+          'upperRight': 'Upper Right',
+          'middleLeft': 'Middle Left',
+          'middleCenter': 'Middle Center',
+          'middleRight': 'Middle Right',
+          'lowerLeft': 'Lower Left',
+          'lowerCenter': 'Lower Center',
+          'lowerRight': 'Lower Right'
+        },
+        scope: 'client',
+        restricted: false,
+        onChange: (value) => {
+          this.toastPosition = value as ToastPosition;
+          this.updateToastPosition();
+        },
+      },
     ]);
+  }
+
+  protected updateToastPosition() {
+    const container = document.querySelector(`.${this.moduleName}`)
+    || document.querySelector(`#${this.lowercaseName}`);
+    if (!container) return;
+    
+    // Remove any existing position classes
+    const positionClasses = ['upper-left', 'upper-center', 'upper-right', 'middle-left', 'middle-center', 'middle-right', 'lower-left', 'lower-center', 'lower-right'];
+    
+    container.classList.remove(...positionClasses);
+    
+    // Add the new position class (convert camelCase to kebab-case)
+    const positionClass = this.toastPosition
+      .replace(/([A-Z])/g, '-$1')
+      .toLowerCase();
+    container.classList.add(positionClass);
+
+    consola.info('Toasted | Updated toast position', { positionClass });
   }
 
   static expandSidebarInstant(sidebar: HTMLDivElement) {
@@ -170,41 +227,6 @@ export class Toasted extends Tome {
 
     Hooks.callAll('sidebarCollapse', ui.sidebar, ui.sidebar._collapsed);
   }
-
-  // static findTarget(card: HTMLDivElement, event: MouseEvent, messageID: string) {
-  //   const cardRect = card.getBoundingClientRect();
-  //   const targetByName = document.querySelector(`.${this.name}`);
-  //   const popupRect = document.querySelector(`.${this.name}`)!.getBoundingClientRect();
-  //   let x = event.clientX - popupRect.left + cardRect.left;
-  //   let y = event.clientY - popupRect.top + cardRect.top;
-
-  //   let target = document.elementFromPoint(x, y);
-  //   let closestMessage = target?.closest('.message');
-  //   let closestMessageID = new El(closestMessage as HTMLDivElement).data('messageId');
-
-  //   if (target && closestMessageID === messageID) {
-  //     return { target, x, y };
-  //   }
-  //   const targetRect = (event.target as HTMLElement).getBoundingClientRect();
-  //   // If click element is obscured, rasterize the target and test if some point is free
-  //   // doing 10 steps in each direction, with a minimum of 5 px is some arbitrary number chosen,
-  //   // but i think its quite okay in regards of accuracy and performance
-  //   const dx = Math.min(targetRect.width / 10, 5);
-  //   const dy = Math.min(targetRect.height / 10, 5);
-  //   for (let vert = targetRect.top + 1; vert < targetRect.bottom; vert += dy) {
-  //     y = vert - popupRect.top + cardRect.top;
-  //     for (let hor = targetRect.left + 1; hor < targetRect.right; hor += dx) {
-  //       x = hor - popupRect.left + cardRect.left;
-  //       target = document.elementFromPoint(x, y);
-  //       closestMessage = target?.closest('.message');
-  //       closestMessageID = new El(closestMessage as HTMLDivElement).data('messageId');
-
-  //       if (target && closestMessageID === messageID) return { target, x, y };
-  //     }
-  //   }
-
-  //   return { target: null, x, y };
-  // }
 
   protected delegateEvent(n: Node, ev: MouseEvent) {
     const node = new El(n as HTMLDivElement);
@@ -252,7 +274,6 @@ export class Toasted extends Tome {
       event
     });
   }
-
 
     target.dispatchEvent(event);
   }
@@ -356,9 +377,9 @@ export class Toasted extends Tome {
 
   static findTarget(originalMessage: HTMLDivElement, event: MouseEvent) {
     const target = (event.target as HTMLElement).closest('[data-interact-id]');
-    if (!target || !target.dataset.interactId) return { target: null, x: 0, y: 0 };
+    if (!target || !(target as HTMLElement).dataset.interactId) return { target: null, x: 0, y: 0 };
 
-    const matchingElement = originalMessage.querySelector(`[data-interact-id="${target.dataset.interactId}"]`);
+    const matchingElement = originalMessage.querySelector(`[data-interact-id="${(target as HTMLElement).dataset.interactId}"]`);
     return {
       target: matchingElement,
       x: event.clientX,

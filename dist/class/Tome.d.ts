@@ -1,5 +1,5 @@
-type CoreLifeCycleHooks = "init" | "ready" | "error" | "setup" | "i18nInit";
-type HookableEvents = "renderChatLog" | "renderChatMessage" | "renderApplication" | CoreLifeCycleHooks;
+type CoreLifeCycleHooks = 'init' | 'ready' | 'error' | 'setup' | 'i18nInit';
+type HookableEvents = 'renderChatLog' | 'renderChatMessage' | 'renderApplication' | CoreLifeCycleHooks;
 type HookEvent = (app: Application, html: JQuery, data?: Record<string, unknown>) => void | Promise<void>;
 interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {
 }
@@ -49,41 +49,45 @@ type ColorRule = Rule & {
 type Rules = NumberRule | BooleanRule | StringRule | ObjectRule | ArrayRule | ColorRule;
 interface TomeRuleConstructor {
     globalSettings?: Array<Rules & {
-        scope?: "world" | "client";
+        scope?: 'world' | 'client';
     }>;
     clientSettings?: Array<Rules & {
-        scope?: "world" | "client";
+        scope?: 'world' | 'client';
     }>;
 }
 export declare abstract class Tome {
     moduleName: string;
     moduleDescription: string;
     settings: Array<Rules & {
-        scope: "world" | "client";
+        scope: 'world' | 'client';
     }>;
     hooks: Map<HookableEvents, HookEvent>;
     socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
     ready: boolean;
+    stylesheets: Array<string>;
     get name(): string;
     get lowercaseName(): string;
     get hasHooks(): boolean;
     get hasSettings(): boolean;
     get hasSocketFns(): boolean;
     get needsEarlyInitialization(): boolean;
-    constructor(pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
+    constructor(pTome: Pick<Tome, 'moduleDescription' | 'moduleName'> & {
         settings?: TomeRuleConstructor;
-        hooks?: Tome["hooks"];
-        socketFns?: Tome["socketFns"];
+        hooks?: Tome['hooks'];
+        socketFns?: Tome['socketFns'];
+        stylesheets?: Array<string>;
+        /** @default false */
         DEBUG?: boolean;
     });
     addHook(event: HookableEvents, callback: HookEvent, overwrite?: boolean): void;
     initializeHooks(): this;
+    initializeStylesheets(): this | undefined;
     registerSetting(rule: Rules & {
-        scope: "world" | "client";
+        scope: 'world' | 'client';
     }): Tome;
     registerSettings(rules: Array<Rules & {
-        scope: "world" | "client";
+        scope: 'world' | 'client';
     }>): Tome;
     initializeSettings(): this;
     getSetting<ExpectedReturn = any>(settingName: string): ExpectedReturn;
