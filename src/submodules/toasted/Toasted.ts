@@ -208,16 +208,31 @@ export class Toasted extends Tome {
 
   protected delegateEvent(n: Node, ev: MouseEvent) {
     const node = new El(n as HTMLDivElement);
-    const card = new El(`.${this.moduleName}`).element.querySelector(
-      `[data-message-id="${node.data('messageId')}"]`,
-    ) as HTMLDivElement;
+    const messageId = node.data('messageId');
+    if (!messageId) {
+      consola.error('Toasted | Message ID not found', { node });
+      return;
+    }
+
+  // Look for the ORIGINAL message in the main chat log, not in the toast container
+  const originalCard = document.querySelector(`#chat-log .message[data-message-id="${messageId}"]`) as HTMLDivElement;
+
     // Card not found? strange.. just return
-    if (!card) return;
-    card.scrollIntoView();
+    if (!originalCard) {
+      if (this.DEBUG) console.warn(`${this.moduleName} | Original message not found`, { messageId });
+      return;
+    }
+
+    originalCard.scrollIntoView();
+
     // Get target element on "real" chat-card
-    const { target, x, y } = Toasted.findTarget(card, ev, node.data('messageId')!);
+    const { target, x, y } = Toasted.findTarget(originalCard, ev);
+
     // If for some reason wrong one was found.. just do nothing
-    if (!target) return;
+    if (!target) {
+      if (this.DEBUG) console.warn(`${this.moduleName} | Target element not found in original message`);
+      return;
+    }
 
     const event = new MouseEvent(ev.type, {
       bubbles: true,
@@ -229,15 +244,15 @@ export class Toasted extends Tome {
       clientY: y,
     });
 
-    consola.info({
-      title: `${this.moduleName} | Delegating event to chat log`,
-      data: {
-        target,
-        x,
-        y,
-        event,
-      },
+  if (this.DEBUG) {
+    consola.info(`${this.moduleName} | Delegating event to chat log`, {
+      target,
+      x,
+      y,
+      event
     });
+  }
+
 
     target.dispatchEvent(event);
   }
