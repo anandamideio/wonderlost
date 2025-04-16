@@ -122,9 +122,6 @@ export class Toasted extends Tome {
           },
         ],
       ]),
-      stylesheets: [
-        'toasted.css'
-      ],
       DEBUG,
     });
 
