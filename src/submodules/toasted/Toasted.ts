@@ -185,12 +185,17 @@ export class Toasted extends Tome {
         },
       },
     ]);
+
+    this.updateToastPosition();
   }
 
   protected updateToastPosition() {
     const container = document.querySelector(`.${this.moduleName}`)
     || document.querySelector(`#${this.lowercaseName}`);
-    if (!container) return;
+    if (!container){
+      consola.error('Toasted | Toast container not found, could not update its position', { container });
+      return;
+    }
     
     // Remove any existing position classes
     const positionClasses = ['upper-left', 'upper-center', 'upper-right', 'middle-left', 'middle-center', 'middle-right', 'lower-left', 'lower-center', 'lower-right'];
