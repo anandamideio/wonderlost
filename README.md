@@ -1,72 +1,112 @@
-![](https://img.shields.io/badge/Foundry-v12-informational)
-<!--- Downloads @ Latest Badge -->
-<!--- replace <user>/<repo> with your username/repository -->
-<!--- ![Latest Release Download Count](https://img.shields.io/github/downloads/<user>/<repo>/latest/module.zip) -->
-
-<!--- Forge Bazaar Install % Badge -->
-<!--- replace <your-module-name> with the `name` in your manifest -->
-<!--- ![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2F<your-module-name>&colorB=4aa94a) -->
-
 # Wonderlost
 
-A module to help support the Wondershade system features in PF2e.
+![Foundry v12](https://img.shields.io/badge/Foundry-v12-informational)
 
-# How to use this Template to create a versioned Release
+A modular Foundry VTT library providing enhanced interface features to support the Wondershade system in PF2e. Wonderlost is designed with a flexible, modular architecture that allows for easy extension and customization.
 
-1. Open your repository's releases page.
+## Architecture
 
-![Where to click to open repository releases.](https://user-images.githubusercontent.com/7644614/93409301-9fd25080-f864-11ea-9e0c-bdd09e4418e4.png)
+Wonderlost is built around a central concept called **Tomes**. Each Tome is a self-contained module that provides specific functionality:
 
-2. Click "Draft a new release"
+```txt
+Wonderlost
+├── Core
+│   ├── Tome.ts (base class)
+│   └── WonderErrors.ts
+└── Submodules
+    ├── Toasted (chat notifications)
+    └── Narrator (storytelling tools)
+```
 
-![Draft a new release button.](https://user-images.githubusercontent.com/7644614/93409364-c1333c80-f864-11ea-89f1-abfcb18a8d9f.png)
+### Core Concepts
 
-3. Fill out the release version as the tag name.
+- **Tome**: The base class for all sub-modules, providing standardized methods for:
+  - Settings management
+  - Hook registration
+  - Socket communication
+  - Stylesheet loading
+  - Debugging support
 
-If you want to add details at this stage you can, or you can always come back later and edit them.
+## Submodules
 
-![Release Creation Form](https://user-images.githubusercontent.com/7644614/93409543-225b1000-f865-11ea-9a19-f1906a724421.png)
+### Toasted
 
-4. Hit submit.
+Toasted provides elegant toast notifications for chat messages, making it easier to keep track of what's happening without keeping the chat log open.
 
-5. Wait a few minutes.
+#### Features
 
-A Github Action will run to populate the `module.json` and `module.zip` with the correct urls that you can then use to distribute this release. You can check on its status in the "Actions" tab.
+- **Position Control**: Place notifications in any of 9 positions on screen (upper/middle/lower × left/center/right)
+- **Customizable Duration**: Set how long notifications remain visible (1-10 seconds)
+- **Message Limit**: Control maximum number of messages displayed simultaneously (1-10)
+- **Interactive**: Click on notifications to interact with the original chat message
+- **Smart Behavior**: Option to show notifications even when chat is already open
 
-![Actions Tab](https://user-images.githubusercontent.com/7644614/93409820-c1800780-f865-11ea-8c6b-c3792e35e0c8.png)
+#### Configuration
 
-6. Grab the module.json url from the release's details page.
+Toasted provides user-configurable settings through the module settings panel:
 
-![image](https://user-images.githubusercontent.com/7644614/93409960-10c63800-f866-11ea-83f6-270cc5d10b71.png)
+| Setting | Description |
+|---------|-------------|
+| Toast Duration | How long messages remain visible (1000-10000ms) |
+| Max Messages | Maximum number of simultaneous toast messages (1-10) |
+| Always Show Notifications | Display toasts even when chat panel is open |
+| Toast Position | Where on screen toasts appear |
 
-This `module.json` will only ever point at this release's `module.zip`, making it useful for sharing a specific version for compatibility purposes.
+### Narrator
 
-7. You can use the url `https://github.com/<user>/<repo>/releases/latest/download/module.json` to refer to the manifest.
+A powerful tool for GMs to enhance storytelling with stylized text and visual effects.
 
-This is the url you want to use to install the module typically, as it will get updated automatically.
+#### Features
 
-# How to List Your Releases on Package Admin
+- Custom fonts for thematic text displays
+- Scene-setting tools
+- NPC dialog formatting
+- And more!
 
-To request a package listing for your first release, go to the [Package Submission Form](https://foundryvtt.com/packages/submit) (accessible via a link at the bottom of the "[Systems and Modules](https://foundryvtt.com/packages/)" page on the Foundry website).
+## Installation
 
-Fill in the form. "Package Name" must match the name in the module manifest.  Package Title will be the display name for the package.  Package URL should be your repo URL.
-![image](https://user-images.githubusercontent.com/36359784/120664263-b49e5500-c482-11eb-9126-af7006389903.png)
+1. In Foundry VTT, navigate to the Add-on Modules tab
+2. Click "Install Module"
+3. Search for "Wonderlost" or paste the manifest URL: `https://github.com/anandamideio/wonderlost/releases/latest/download/module.json`
+4. Click "Install"
 
-One of the Foundry staff will typically get back to you with an approval or any further questions within a few days, and give you access to the package admin pages.
+## Usage
 
-Once you have access to the [module admin page](https://foundryvtt.com/admin/packages/package/), you can release a new version by going into the page for your module, scrolling to the bottom, and filling in a new Package Version.
+After installation, Wonderlost and its submodules will be automatically initialized. Each submodule can be configured through the module settings panel in Foundry VTT.
 
-When listing a new version, Version should be the version number you set above, and the Manifest URL should be the manifest __for that specific version__ (do not use /latest/ here).
-![image](https://user-images.githubusercontent.com/36359784/120664346-c4b63480-c482-11eb-9d8b-731b50d70939.png)
+### Development
 
-> ### :warning: Important :warning:
->
-> It is very important that you use the specific release manifest url, and not the `/latest` url here. For more details about why this is important and how Foundry Installs/Updates packages, read [this wiki article](https://foundryvtt.wiki/en/development/guides/releases-and-history).
+If you're interested in extending Wonderlost with your own Tomes, the base architecture makes it straightforward:
 
-Clicking "Save" in the bottom right will save the new version, which means that anyone installing your module from within Foundry will get that version, and a post will be generated in the #release-announcements channel on the official Foundry VTT Discord.
+```typescript
+export class MyCustomTome extends Tome {
+  constructor(DEBUG = false) {
+    super({
+      moduleName: 'MyCustomTome',
+      moduleDescription: 'My custom functionality',
+      hooks: new Map([
+        // Your hooks here
+      ]),
+      settings: {
+        // Your settings here
+      },
+      DEBUG,
+    });
+  }
+  
+  // Your custom methods here
+}
+```
 
-# FoundryVTT Module
+## License
 
-Does something, probably
+MIT License
 
-## Changelog
+## Credits
+
+- Created by Antonio B.
+- Special thanks to the Foundry VTT community
+
+---
+
+*Wonderlost is not affiliated with Paizo Inc. or the Pathfinder 2e game system.*
