@@ -277,11 +277,11 @@ export class Narrator extends Tome {
       return new Promise<void>(resolve => {
         // Use Foundry's canvas animation system for compatibility
         // Note: This is different from the PIXI Animation in your original code
-        canvas?.app.ticker.add(function animate(delta) {
+        canvas?.app?.ticker.add(function animate(delta) {
           const t = Math.min(1, this.t + (delta / 60));
           
           // Apply easing (simplified easeOutQuad)
-          const easedT = 1 - Math.pow(1 - t, 2);
+          const easedT = 1 - (1 - t) ** 2;
           
           // Update scale and alpha
           const scale = animation.initialScale! + (animation.finalScale! - animation.initialScale!) * easedT;
