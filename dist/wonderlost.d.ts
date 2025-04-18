@@ -1,11 +1,11 @@
-import { Toasted } from "./submodules/toasted/Toasted";
 import { Narrator } from './submodules/narrator/Narrator';
+import { Toasted } from './submodules/toasted/Toasted';
 declare class Wonderlost {
     DEBUG: boolean;
-    modules: Map<"Toasted" | "Narrator", typeof Toasted | typeof Narrator>;
+    modules: Map<"Narrator" | "Toasted", typeof Narrator | typeof Toasted>;
     constructor(DEBUG?: boolean);
     initializeModules(): void;
-    getModule(moduleName: 'Toasted' | 'Narrator'): typeof Toasted | typeof Narrator | undefined;
+    getModule(moduleName: 'Toasted' | 'Narrator'): typeof Narrator | typeof Toasted | undefined;
     moduleExists(moduleName: 'Toasted' | 'Narrator'): boolean;
     getAllModules(): Array<'Toasted' | 'Narrator'>;
     logAllModules(): void;

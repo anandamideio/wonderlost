@@ -1,6 +1,6 @@
 import consola from 'consola';
-import { Toasted } from "./submodules/toasted/Toasted";
 import { Narrator } from './submodules/narrator/Narrator';
+import { Toasted } from './submodules/toasted/Toasted';
 
 type ToastedTuple = ['Toasted', typeof Toasted];
 type NarratorTuple = ['Narrator', typeof Narrator];
@@ -21,17 +21,19 @@ class Wonderlost {
 
   initializeModules() {
     for (const [tomeName, Tome] of this.modules) {
-			if (this.DEBUG) {
-    		consola.start(`Wonderlost | Initializing ${tomeName}`);
-  		}
+      if (this.DEBUG) {
+        consola.start(`Wonderlost | Initializing ${tomeName}`, {
+          Tome: Tome.prototype.toJSON(),
+        });
+      }
 
-  new Tome(this.DEBUG).initialize();
+      new Tome(this.DEBUG).initialize();
 
-  if (this.DEBUG) {
-    consola.info(`Wonderlost | Initialized ${tomeName}`, {
-      Tome: Tome.prototype.toJSON(),
-    });
-  }
+      if (this.DEBUG) {
+        consola.info(`Wonderlost | Initialized ${tomeName}`, {
+          Tome: Tome.prototype.toJSON(),
+        });
+      }
     }
   }
 
@@ -56,13 +58,14 @@ class Wonderlost {
 const wonderlost = new Wonderlost(true);
 
 Hooks.once("setup", () => {
-  console.log("Wonderlost | Setup started");
+  consola.start('Wonderlost | Setup started');
   wonderlost.initializeModules();
-  console.log("Wonderlost | Ready");
-  
+  wonderlost.logAllModules();
+  consola.success('Wonderlost | Ready');
+
   // Make API available globally for other modules
   // @ts-ignore
-  game.modules.get("wonderlost").api = wonderlost;
+  game.modules.get('wonderlost').api = wonderlost;
 });
 
 export default wonderlost;

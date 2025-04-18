@@ -1,3 +1,4 @@
+import consola from 'consola';
 import { Tome } from 'src/class/Tome';
 
 /**
@@ -149,20 +150,20 @@ export class Narrator extends Tome {
    * Set up the narrator display system
    */
   private async setup(): Promise<void> {
-    if (this.DEBUG) console.log("Narrator | Setting up");
-    
+    if (this.DEBUG) consola.start('Narrator | Setting up');
+
     // Create a container for narrator elements
     this.container = new PIXI.Container();
     this.container.zIndex = 1000; // Position above most elements
-    
+
     // Add the container to the interface layer
     canvas?.interface?.addChild(this.container);
-    
+
     // Load fonts
     await this.loadFonts();
-    
+
     this.ready = true;
-    if (this.DEBUG) console.log("Narrator | Setup complete");
+    if (this.DEBUG) consola.success('Narrator | Setup complete');
   }
 
   /**
