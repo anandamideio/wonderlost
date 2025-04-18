@@ -21,6 +21,46 @@ export abstract class Tome {
     return this.moduleName.toLowerCase();
   }
 
+  /**
+   * Get the module's i18n namespace
+   * @returns The namespace used for i18n keys
+   */
+  get i18nNamespace(): string {
+    return `${this.lowercaseName}`;
+  }
+
+  /**
+   * Localize a string key
+   * @param key The localization key within this module's namespace
+   * @returns The localized string
+   */
+  localize(key: string): string {
+    return game.i18n!.localize(`${this.i18nNamespace}.${key}`);
+  }
+
+  /**
+   * Format a localized string with data
+   * @param key The localization key within this module's namespace
+   * @param data The data to use in the template
+   * @returns The formatted string
+   */
+  format(key: string, data: Record<string, unknown>): string {
+    return game.i18n!.format(`${this.i18nNamespace}.${key}`, data);
+  }
+
+  /**
+   * Check if a translation key exists
+   * @param key The localization key within this module's namespace
+   * @returns Whether the key exists
+   */
+  hasTranslation(key: string): boolean {
+    return game.i18n!.has(`${this.i18nNamespace}.${key}`);
+  }
+
+  /**
+   * Check if the module has hooks
+   * @returns True if hooks are present, otherwise false
+   */
   get hasHooks() {
     return this.hooks.size > 0;
   }
@@ -122,8 +162,8 @@ export abstract class Tome {
 
     /** Create the isEnabled rule typed to the module so users can disable the module with ease */
     game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-isEnabled`), {
-      name: `${this.moduleName} - Is Enabled`,
-      hint: 'Is the module enabled?',
+      name: this.localize('isEnabled'),
+      hint: this.localize('isEnabled_hint'),
       scope: 'world',
       config: true,
       default: true,
@@ -307,6 +347,8 @@ export abstract class Tome {
   toJSON() {
     return {
       moduleName: this.moduleName,
+      lowercaseName: this.lowercaseName,
+      i18nNamespace: this.i18nNamespace,
       moduleDescription: this.moduleDescription,
       settings: this.settings,
       hooks: this.hooks,

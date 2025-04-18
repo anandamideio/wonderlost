@@ -12,6 +12,34 @@ export declare abstract class Tome {
     enabled: boolean;
     get name(): string;
     get lowercaseName(): string;
+    /**
+     * Get the module's i18n namespace
+     * @returns The namespace used for i18n keys
+     */
+    get i18nNamespace(): string;
+    /**
+     * Localize a string key
+     * @param key The localization key within this module's namespace
+     * @returns The localized string
+     */
+    localize(key: string): string;
+    /**
+     * Format a localized string with data
+     * @param key The localization key within this module's namespace
+     * @param data The data to use in the template
+     * @returns The formatted string
+     */
+    format(key: string, data: Record<string, unknown>): string;
+    /**
+     * Check if a translation key exists
+     * @param key The localization key within this module's namespace
+     * @returns Whether the key exists
+     */
+    hasTranslation(key: string): boolean;
+    /**
+     * Check if the module has hooks
+     * @returns True if hooks are present, otherwise false
+     */
     get hasHooks(): boolean;
     get hasSettings(): boolean;
     get hasSocketFns(): boolean;
@@ -43,6 +71,8 @@ export declare abstract class Tome {
     static kebabCase(str: string): string;
     toJSON(): {
         moduleName: string;
+        lowercaseName: string;
+        i18nNamespace: string;
         moduleDescription: string;
         settings: (Rules & {
             scope: "world" | "client";
