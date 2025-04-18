@@ -18,5 +18,7 @@
     "toasted.toastFontSize_hint": "Font size of the toast message text.",
     "toasted.toastShadow_name": "Toast Shadow",
     "toasted.toastShadow_hint": "Enable or disable shadow for the toast message.",
-    "toasted.saveButton": "Save Settings"
+    "toasted.saveButton": "Save Settings",
+    "narrator.isEnabled": "Narrator - Is Enabled?",
+    "narrator.isEnabled_hint": "Is the module enabled?"
 }
