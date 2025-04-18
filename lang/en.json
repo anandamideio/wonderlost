@@ -1,24 +1,29 @@
 {
     "MODULE.hello": "hello",
+
+
     "toasted.isEnabled": "Toasted - Is Enabled?",
     "toasted.isEnabled_hint": "Is the module enabled?",
+
     "toasted.toastDuration_name": "Toast Duration",
-    "toasted.toastDuration_hint": "Duration in milliseconds for how long the toast message will be displayed.",
+    "toasted.toastDuration_hint": "How long would you like a message to stay on screen? (In Milliseconds)",
+    "toasted.maxMessages_name": "Max Messages",
+    "toasted.maxMessages_hint": "Maximum number of messages to display at once.",
+    "toasted.alwaysShow_name": "Always Show Toasts?",
+    "toasted.alwaysShow_hint": "Would you prefer toast are shown even if the chat panel is open?",
+
     "toasted.toastPosition_name": "Toast Position",
-    "toasted.toastPosition_hint": "Position on the screen where the toast message will appear.",
-    "toasted.toastPosition_topLeft": "Top Left",
-    "toasted.toastPosition_topRight": "Top Right",
-    "toasted.toastPosition_bottomLeft": "Bottom Left",
-    "toasted.toastPosition_bottomRight": "Bottom Right",
-    "toasted.toastBgColor_name": "Toast Background Color",
-    "toasted.toastBgColor_hint": "Background color of the toast message.",
-    "toasted.toastTextColor_name": "Toast Text Color",
-    "toasted.toastTextColor_hint": "Text color of the toast message.",
-    "toasted.toastFontSize_name": "Toast Font Size",
-    "toasted.toastFontSize_hint": "Font size of the toast message text.",
-    "toasted.toastShadow_name": "Toast Shadow",
-    "toasted.toastShadow_hint": "Enable or disable shadow for the toast message.",
-    "toasted.saveButton": "Save Settings",
+    "toasted.toastPosition_hint": "Where would you like toast notifications to appear on screen?",
+    "toasted.toastPosition_topLeft": "Upper Left",
+    "toasted.toastPosition_topCenter": "Upper Center",
+    "toasted.toastPosition_topRight": "Upper Right",
+    "toasted.toastPosition_middleLeft": "Middle Left",
+    "toasted.toastPosition_middleCenter": "Middle Center",
+    "toasted.toastPosition_middleRight": "Middle Right",
+    "toasted.toastPosition_bottomLeft": "Lower Left",
+    "toasted.toastPosition_bottomCenter": "Lower Center",
+    "toasted.toastPosition_bottomRight": "Lower Right",
+
     "narrator.isEnabled": "Narrator - Is Enabled?",
     "narrator.isEnabled_hint": "Is the module enabled?"
 }
