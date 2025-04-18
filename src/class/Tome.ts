@@ -73,6 +73,7 @@ export abstract class Tome {
 		public socketFns: Map<string, (data: unknown) => void> = new Map();
 		public DEBUG?: boolean = false;
 		public ready = false;
+		public enabled = true;
 
 		get name() {
 			return this.moduleName;
@@ -212,14 +213,28 @@ export abstract class Tome {
 		}
 
 		public initializeSettings() {
-			this.settings.forEach((setting) => {
-				if (this.DEBUG) {
-					consola.box({
-						title: `[TOME::${this.moduleName}] => Registering ${setting.name}`,
-						additional: { ...setting },
-					});
-				}
+			if (this.DEBUG) {
+				consola.info(
+					`[TOME::${this.moduleName}] => Initializing settings`,
+					this.settings,
+				);
+			}
 
+			/** Create the isEnabled rule typed to the module so users can disable the module with ease */
+			game.settings?.register(
+				"wonderlost",
+				Tome.kabob(`${this.lowercaseName}-isEnabled`),
+				{
+					name: "Is Enabled",
+					hint: "Disable this module",
+					scope: "world",
+					config: true,
+					default: true,
+					type: Boolean,
+				},
+			);
+
+			this.settings.forEach((setting) => {
 				game.settings?.register(
 					"wonderlost",
 					Tome.kabob(`${this.lowercaseName}-${setting.name}`),

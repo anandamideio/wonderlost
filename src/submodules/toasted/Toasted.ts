@@ -78,6 +78,13 @@ export class Toasted extends Tome {
         [
           'renderChatMessage',
           async (_app, html, _options) => {
+            if (this.enabled!){
+              if (this.DEBUG){
+                consola.info('Toasted | Disabled, would\'ve rendered a message')
+              }
+              return;
+            }
+
             if (this.ready && this.ToastedReady) {
               const original = html[0];
               const clone = this.cloneMessage(original);
@@ -155,7 +162,7 @@ export class Toasted extends Tome {
         hint: 'Would you prefer toast are shown even if the chat panel is open?',
         type: Boolean,
         defaultValue: this.alwaysShowNotifications,
-        scope: 'client',
+        scope: 'world',
         restricted: false,
         onChange: (value) => {
           this.alwaysShowNotifications = Boolean(value);
@@ -167,17 +174,17 @@ export class Toasted extends Tome {
         type: String,
         defaultValue: this.toastPosition,
         choices: {
-          'upperLeft': 'Upper Left',
-          'upperCenter': 'Upper Center',
-          'upperRight': 'Upper Right',
-          'middleLeft': 'Middle Left',
-          'middleCenter': 'Middle Center',
-          'middleRight': 'Middle Right',
-          'lowerLeft': 'Lower Left',
-          'lowerCenter': 'Lower Center',
-          'lowerRight': 'Lower Right'
+          upperLeft: 'Upper Left',
+          upperCenter: 'Upper Center',
+          upperRight: 'Upper Right',
+          middleLeft: 'Middle Left',
+          middleCenter: 'Middle Center',
+          middleRight: 'Middle Right',
+          lowerLeft: 'Lower Left',
+          lowerCenter: 'Lower Center',
+          lowerRight: 'Lower Right',
         },
-        scope: 'client',
+        scope: 'world',
         restricted: false,
         onChange: (value) => {
           this.toastPosition = value as ToastPosition;
@@ -190,8 +197,7 @@ export class Toasted extends Tome {
   }
 
   protected updateToastPosition() {
-    const container = document.querySelector(`.${this.moduleName}`)
-    || document.querySelector(`#${this.lowercaseName}`);
+    const container = document.querySelector(`.${this.moduleName}`) ?? document.querySelector(`#${this.lowercaseName}`);
     if (!container){
       consola.error('Toasted | Toast container not found, could not update its position', { container });
       return;
@@ -377,18 +383,6 @@ export class Toasted extends Tome {
     return clone;
   }
 
-  static findTarget(originalMessage: HTMLDivElement, event: MouseEvent) {
-    const target = (event.target as HTMLElement).closest('[data-interact-id]');
-    if (!target || !(target as HTMLElement).dataset.interactId) return { target: null, x: 0, y: 0 };
-
-    const matchingElement = originalMessage.querySelector(`[data-interact-id="${(target as HTMLElement).dataset.interactId}"]`);
-    return {
-      target: matchingElement,
-      x: event.clientX,
-      y: event.clientY,
-    };
-  }
-
   protected getElementIndex(element: Element) {
     if (!element.parentElement) return -1;
 
@@ -402,4 +396,17 @@ export class Toasted extends Tome {
 
     return index;
   }
+
+  static findTarget(originalMessage: HTMLDivElement, event: MouseEvent) {
+    const target = (event.target as HTMLElement).closest('[data-interact-id]');
+    if (!target || !(target as HTMLElement).dataset.interactId) return { target: null, x: 0, y: 0 };
+
+    const matchingElement = originalMessage.querySelector(`[data-interact-id="${(target as HTMLElement).dataset.interactId}"]`);
+    return {
+      target: matchingElement,
+      x: event.clientX,
+      y: event.clientY,
+    };
+  }
+
 }

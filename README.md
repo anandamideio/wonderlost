@@ -2,7 +2,8 @@
 
 ![Foundry v12](https://img.shields.io/badge/Foundry-v12-informational)
 
-A modular Foundry VTT library providing enhanced interface features to support the Wondershade system in PF2e. Wonderlost is designed with a flexible, modular architecture that allows for easy extension and customization.
+Wonderlost is a collection of modules for Foundry VTT designed to enhance your gaming experience. It includes features like toast notifications for chat messages and storytelling tools for GMs.
+Wonderlost is built with modularity in mind, allowing you to easily add or remove features as needed.
 
 ## Architecture
 
