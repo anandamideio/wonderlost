@@ -7,6 +7,7 @@ export declare class Toasted extends Tome {
     fadeOutDelay: number;
     toastPosition: ToastPosition;
     ToastedReady: boolean;
+    enabled: boolean;
     menu: El<'div', true> | null;
     constructor(DEBUG?: boolean);
     protected updateToastPosition(): void;

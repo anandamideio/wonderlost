@@ -21,6 +21,7 @@ export class Toasted extends Tome {
   public fadeOutDelay = 3000;
   public toastPosition: ToastPosition = 'upperLeft';
   public ToastedReady = false;
+  public enabled = true;
 
   public menu: El<'div', true> | null = null;
 
@@ -78,7 +79,7 @@ export class Toasted extends Tome {
         [
           'renderChatMessage',
           async (_app, html, _options) => {
-            if (this.enabled!){
+            if (this.enabled === false){
               if (this.DEBUG){
                 consola.info('Toasted | Disabled, would\'ve rendered a message')
               }
