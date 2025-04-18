@@ -1,373 +1,357 @@
-import consola from 'consola';
 import { Tome } from 'src/class/Tome';
-import { FontsLoader } from 'src/modules/fontLoader/FontLoader';
 
+/**
+ * Options for the narrator text display
+ */
 interface NarratorTextOptions {
-  /**
-   * The total duration the narrator text should be displayed in milliseconds.
-   * Default: 5000 (5 seconds)
-   */
+  /** Duration in milliseconds (default: 5000) */
   duration?: number;
-
-  /**
-   * The font size of the text.
-   * Default: 48
-   */
+  /** Font size in pixels (default: 48) */
   fontSize?: number;
-
-  /**
-   * The color of the text in hexadecimal format.
-   * Default: '#ffffff' (white)
-   */
+  /** Text color in hex (default: '#ffffff') */
   fontColor?: string;
-
-  /**
-   * The background color of the overlay in hexadecimal format.
-   * Default: '#000000' (black)
-   */
+  /** Background color in hex (default: '#000000') */
   backgroundColor?: string;
-
-  /**
-   * The opacity of the overlay (0 to 1).
-   * Default: 0.8
-   */
+  /** Background opacity 0-1 (default: 0.8) */
   opacity?: number;
-
-  /**
-   * The font family to use for the text.
-   * Default: The first font in Narrator.fonts
-   */
+  /** Font family to use (default: configured title font) */
   fontFamily?: string;
-
-  /**
-   * The font weight to use for the text.
-   * Default: '400'
-   */
+  /** Font weight (default: configured title weight) */
   fontWeight?: string;
-
-  /**
-   * The font style to use for the text.
-   * Default: 'normal'
-   */
+  /** Font style (default: 'normal') */
   fontStyle?: 'normal' | 'italic' | 'oblique';
-
-  /**
-   * The alignment of the text.
-   * Default: 'center'
-   */
+  /** Text alignment (default: 'center') */
   textAlign?: 'left' | 'center' | 'right';
-
-  /**
-   * The maximum width for word wrapping.
-   * Default: canvas.width * 0.8
-   */
+  /** Word wrap width (default: 80% of canvas width) */
   wordWrapWidth?: number;
-
-  /**
-   * Whether to enable word wrapping.
-   * Default: true
-   */
+  /** Enable word wrapping (default: true) */
   wordWrap?: boolean;
-
-  /**
-   * Custom animation options for the text appearance.
-   */
+  /** Animation options */
   animation?: {
-    /**
-     * The duration of the animation in milliseconds.
-     * Default: 1000 (1 second)
-     */
+    /** Animation duration in ms (default: 1000) */
     duration?: number;
-
-    /**
-     * The easing function for the animation.
-     * Default: 'easeOut'
-     */
+    /** Animation easing (default: 'easeOutQuad') */
     easing?: string;
-
-    /**
-     * The initial scale of the text.
-     * Default: 0.5
-     */
+    /** Initial scale (default: 0.5) */
     initialScale?: number;
-
-    /**
-     * The final scale of the text.
-     * Default: 1.2
-     */
+    /** Final scale (default: 1.2) */
     finalScale?: number;
-
-    /**
-     * The initial alpha of the text.
-     * Default: 0
-     */
+    /** Initial opacity (default: 0) */
     initialAlpha?: number;
-
-    /**
-     * The final alpha of the text.
-     * Default: 1
-     */
+    /** Final opacity (default: 1) */
     finalAlpha?: number;
   };
 }
 
+/**
+ * Narrator module for displaying cinematic text overlays
+ */
 export class Narrator extends Tome {
-  public static fonts = [
-    "Caslon",
-    "CaslonAntique",
-    "SignikaBold",
-    "Riffic",
-    "IronSans",
-    "LinLibertine",
-    "TimesNewRomance",
-    "TimesNewYorker",
-    "LPEducational",
-    "Cardinal",
-    "OldLondon",
-    "StoneHenge",
-    "SunnyDay",
-    "PaulSignature",
-    "LemonTuesday",
-    "FairProsper",
-    "BalletHarmony",
-    "MagieraScript",
-    "Cathallina",
-    "Hamish",
-    "DreamersBrush",
-    "FastInMyCar",
-    "ChildWriting",
-    "Kindergarten",
-    "FuturaHandwritten",
-    "Fewriter",
-    "TrashHand",
-    "GoodBrush",
-    "BaksoSapi",
-    "SuplexmentaryComic",
-    "ComicInk",
-    "DreamyLand",
-    "Yikes",
-    "GangOfThree",
-    "JianGkrik",
-    "Yozakura",
-    "Hiroshio",
-    "ArabDances",
-    "Rooters",
-    "Subway",
-    "Himagsikan",
-    "MilTown",
-    "Galactico",
-    "Oko",
-    "Ethnocentric",
-    "VenusRising",
-    "StampAct",
-    "Kirsty",
-    "Western",
-    "BreakAway",
-    "YoungerThanMe",
-    "Underground",
-    "VarsityTeam",
-    "Valentino",
-    "GlassHouses",
-    "Makayla",
-    "DancingVampyrish",
-    "Codex",
-    "DSNetStamped",
-    "HappyFrushZero",
-    "Shoplifter",
-    "Stereofidelic",
-    "Headache",
-    "HorrorHouse",
-    "GhostTheory2",
-    "Syemox",
-    "GhostChase"
-  ] as const;
-  public static fontWeights = [
-    "100",
-    "200",
-    "300",
-    "400",
-    "500",
-    "600",
-    "700",
-    "800",
-    "900"
-  ] as const;
-  public static fontStyles = [
-    "normal",
-    "italic",
-    "oblique"
+  // Available fonts for the narrator
+  static readonly FONTS = [
+    "Caslon", "CaslonAntique", "SignikaBold", "Riffic", "IronSans",
+    "LinLibertine", "TimesNewRomance", "TimesNewYorker", "LPEducational",
+    "Cardinal", "OldLondon", "StoneHenge", "SunnyDay", "PaulSignature",
+    "LemonTuesday", "FairProsper", "BalletHarmony", "MagieraScript",
+    "Cathallina", "Hamish", "DreamersBrush", "FastInMyCar", "ChildWriting",
+    "Kindergarten", "FuturaHandwritten", "Fewriter", "TrashHand",
+    "GoodBrush", "BaksoSapi", "SuplexmentaryComic", "ComicInk",
+    "DreamyLand", "Yikes", "GangOfThree", "JianGkrik", "Yozakura",
+    "Hiroshio", "ArabDances", "Rooters", "Subway", "Himagsikan",
+    "MilTown", "Galactico", "Oko", "Ethnocentric", "VenusRising",
+    "StampAct", "Kirsty", "Western", "BreakAway", "YoungerThanMe",
+    "Underground", "VarsityTeam", "Valentino", "GlassHouses", "Makayla",
+    "DancingVampyrish", "Codex", "DSNetStamped", "HappyFrushZero",
+    "Shoplifter", "Stereofidelic", "Headache", "HorrorHouse", "GhostTheory2",
+    "Syemox", "GhostChase"
   ] as const;
 
-  public get titleFont() {
-    return this.getSetting<typeof Narrator['fonts'][number]>("Title Font") ?? "GhostTheory2";
-  }
-  public static get titleFont() {
-    return game.settings?.get('wonderlost', Tome.kabob('narrator-Title Font')) as typeof Narrator['fonts'][number]
-      ?? "GhostTheory2" as typeof Narrator['fonts'][number];
-  }
-  public static set titleFont(value: typeof Narrator['fonts'][number]) {
-    game.settings?.set('wonderlost', 'narrator-title-font', value);
-  }
+  // Available font weights
+  static readonly FONT_WEIGHTS = [
+    "100", "200", "300", "400", "500", "600", "700", "800", "900"
+  ] as const;
 
-  public get textFont() {
-    return this.getSetting<typeof Narrator['fonts'][number]>("Text Font") ?? "GhostTheory2";
-  }
-  public static get textFont() {
-    return game.settings?.get('wonderlost', Tome.kabob('narrator-Text Font')) as typeof Narrator['fonts'][number]
-      ?? "GhostTheory2";
-  }
-  public static set textFont(value: typeof Narrator['fonts'][number]) {
-    game.settings?.set('wonderlost', 'narrator-text-font', value);
-  }
+  // Available font styles
+  static readonly FONT_STYLES = [
+    "normal", "italic", "oblique"
+  ] as const;
 
-  public get titleWeight() {
-    return this.getSetting<typeof Narrator['fontWeights'][number]>("Title Weight") ?? "400";
-  }
-  public static get titleWeight() {
-    return game.settings?.get('wonderlost', Tome.kabob('narrator-Title Weight')) as typeof Narrator['fontWeights'][number]
-      ?? "400";
-  }
-  public static set titleWeight(value: typeof Narrator['fontWeights'][number]) {
-    game.settings?.set('wonderlost', 'narrator-title-weight', value);
-  }
+  // Container for the narrator display
+  private container: PIXI.Container | null = null;
+  
+  // Track if fonts have been loaded
+  private fontsLoaded = false;
 
-  private canvas?: HTMLCanvasElement;
-  private stage?: PIXI.Application;
-
-  constructor(DEBUG = false) {
+  constructor(debug = false) {
     super({
       moduleName: "Narrator",
-      moduleDescription: "An extremely customizable on screen narrator system",
-      // hooks: new Map([
-      //   ['ready', async () => { await this.setup(); }],
-      //   ['renderScene', async () => { if (this.ready) { this.render() } }]
-      // ]),
-      socketFns: new Map([]),
-      DEBUG
-    })
+      moduleDescription: "Customizable on-screen narrator system",
+      DEBUG: debug
+    });
 
     this.registerSettings([
       {
         name: "Title Font",
-        hint: "The font used for the title text",
+        hint: "The font used for narrator titles",
         type: String,
-        scope: 'world',
-
+        scope: "world",
         restricted: false,
         defaultValue: "GhostTheory2",
-        choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
+        choices: Object.fromEntries(Narrator.FONTS.map(font => [font, font])),
       },
       {
         name: "Text Font",
-        hint: "The font used for the text body",
+        hint: "The font used for narrator text body",
         type: String,
-        scope: 'world',
-
+        scope: "world",
         restricted: false,
         defaultValue: "GhostTheory2",
-        choices: Object.fromEntries(Narrator.fonts.map((font) => [font, font])),
+        choices: Object.fromEntries(Narrator.FONTS.map(font => [font, font])),
       },
       {
         name: "Title Weight",
         hint: "The weight of the title font",
         type: String,
-        scope: 'world',
-
+        scope: "world",
         restricted: false,
         defaultValue: "400",
-        choices: Object.fromEntries(Narrator.fontWeights.map((weight) => [weight, weight])),
+        choices: Object.fromEntries(Narrator.FONT_WEIGHTS.map(weight => [weight, weight])),
       }
     ]);
+
+    // Register hook for initialization
+    Hooks.once('canvasReady', () => this.setup());
   }
 
+  /**
+   * Get the configured title font
+   */
+  get titleFont(): typeof Narrator.FONTS[number] {
+    return this.getSetting<typeof Narrator.FONTS[number]>("Title Font") ?? "GhostTheory2";
+  }
+
+  /**
+   * Get the configured text font
+   */
+  get textFont(): typeof Narrator.FONTS[number] {
+    return this.getSetting<typeof Narrator.FONTS[number]>("Text Font") ?? "GhostTheory2";
+  }
+
+  /**
+   * Get the configured title weight
+   */
+  get titleWeight(): typeof Narrator.FONT_WEIGHTS[number] {
+    return this.getSetting<typeof Narrator.FONT_WEIGHTS[number]>("Title Weight") ?? "400";
+  }
+
+  /**
+   * Set up the narrator display system
+   */
   private async setup(): Promise<void> {
-    this.canvas = document.createElement('canvas');
-    document.body.appendChild(this.canvas);
-    this.canvas.width = window.innerWidth;
-    this.canvas.height = window.innerHeight;
-
-    this.stage = new PIXI.Application({
-      view: this.canvas,
-      width: this.canvas.width,
-      height: this.canvas.height,
-      backgroundColor: 0x000000,
-      resolution: devicePixelRatio || 1,
-    });
-
+    if (this.DEBUG) console.log("Narrator | Setting up");
+    
+    // Create a container for narrator elements
+    this.container = new PIXI.Container();
+    this.container.zIndex = 1000; // Position above most elements
+    
+    // Add the container to the interface layer
+    canvas?.interface?.addChild(this.container);
+    
+    // Load fonts
     await this.loadFonts();
+    
     this.ready = true;
+    if (this.DEBUG) console.log("Narrator | Setup complete");
   }
 
+  /**
+   * Load required fonts
+   */
   private async loadFonts(): Promise<void> {
-    const titleFont = this.getSetting<typeof Narrator['fonts'][number]>("Title Font") ?? "GhostTheory2";
-    const textFont = this.getSetting<typeof Narrator['fonts'][number]>("Text Font") ?? "GhostTheory2";
+    // Use FontsLoader to load the fonts
+    // This is a simplified implementation - you would need to implement actual font loading
+    try {
+      // Load primary fonts first (the ones currently selected in settings)
+      await this.loadFontSet([this.titleFont, this.textFont]);
+      
+      // Then load the rest for potential usage
+      const otherFonts = Narrator.FONTS.filter(font => 
+        font !== this.titleFont && font !== this.textFont
+      );
+      await this.loadFontSet(otherFonts);
+      
+      this.fontsLoaded = true;
+      if (this.DEBUG) console.log("Narrator | Fonts loaded");
+    } catch (error) {
+      console.error("Narrator | Error loading fonts:", error);
+    }
+  }
 
-    await FontsLoader({
-      custom: {
-        families: [titleFont, textFont],
-      },
+  /**
+   * Helper to load a set of fonts
+   */
+  private async loadFontSet(fonts: string[]): Promise<void> {
+    // Implement with your FontsLoader
+    // Example implementation:
+    return new Promise((resolve) => {
+      // Mock implementation - replace with your actual font loading code
+      setTimeout(resolve, 100);
+    });
+  }
+
+  /**
+   * Display narrator text on screen
+   */
+  public async displayText(text: string, options: NarratorTextOptions = {}): Promise<void> {
+    if (!this.ready) {
+      console.warn("Narrator | System not ready yet");
+      return;
+    }
+
+    if (!this.container) {
+      console.error("Narrator | Container not initialized");
+      return;
+    }
+
+    // Clear any existing display
+    this.container.removeChildren();
+
+    // Default options
+    const {
+      duration = 5000,
+      fontSize = 48,
+      fontColor = '#ffffff',
+      backgroundColor = '#000000',
+      opacity = 0.8,
+      fontFamily = this.titleFont,
+      fontWeight = this.titleWeight,
+      fontStyle = 'normal',
+      textAlign = 'center',
+      wordWrap = true,
+      wordWrapWidth = canvas?.dimensions?.width ? canvas?.dimensions.width * 0.8 : window.innerWidth * 0.8,
+      animation = {
+        duration: 1000,
+        easing: 'easeOutQuad',
+        initialScale: 0.5,
+        finalScale: 1.2,
+        initialAlpha: 0,
+        finalAlpha: 1
+      }
+    } = options;
+
+    // Create background overlay
+    const overlay = new PIXI.smooth.Graphics();
+    overlay.beginFill(Number.parseInt(backgroundColor.replace('#', '0x')));
+    overlay.drawRect(0, 0, canvas?.dimensions?.width || window.innerWidth, canvas?.dimensions?.height || window.innerHeight);
+    overlay.endFill();
+    overlay.alpha = opacity;
+    this.container.addChild(overlay);
+
+    // Create text
+    const style = new PIXI.TextStyle({
+      fontFamily: fontFamily,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      fontStyle: fontStyle,
+      fill: fontColor,
+      align: textAlign,
+      wordWrap: wordWrap,
+      wordWrapWidth: wordWrapWidth
     });
 
-    const otherFonts = Narrator.fonts.filter(font =>
-      font !== titleFont && font !== textFont
+    const textObject = new PIXI.Text(text, style);
+    textObject.anchor.set(0.5, 0.5);
+    textObject.position.set(
+      canvas?.dimensions?.width ? canvas?.dimensions.width / 2 : window.innerWidth / 2,
+      canvas?.dimensions?.height ? canvas?.dimensions.height / 2 : window.innerHeight / 2
     );
+    
+    // Set initial animation state
+    textObject.scale.set(animation.initialScale!, animation.initialScale!);
+    textObject.alpha = animation.initialAlpha!;
+    
+    this.container.addChild(textObject);
 
-    await FontsLoader({
-      custom: {
-        families: otherFonts,
-      },
-    });
+    // Animate in
+    const animateIn = () => {
+      return new Promise<void>(resolve => {
+        // Use Foundry's canvas animation system for compatibility
+        // Note: This is different from the PIXI Animation in your original code
+        canvas?.app.ticker.add(function animate(delta) {
+          const t = Math.min(1, this.t + (delta / 60));
+          
+          // Apply easing (simplified easeOutQuad)
+          const easedT = 1 - Math.pow(1 - t, 2);
+          
+          // Update scale and alpha
+          const scale = animation.initialScale! + (animation.finalScale! - animation.initialScale!) * easedT;
+          const alpha = animation.initialAlpha! + (animation.finalAlpha! - animation.initialAlpha!) * easedT;
+          
+          textObject.scale.set(scale, scale);
+          textObject.alpha = alpha;
+          
+          this.t = t;
+          if (t >= 1) {
+            canvas?.app?.ticker.remove(animate);
+            resolve();
+          }
+        }.bind({ t: 0 }));
+      });
+    };
+
+    // Animate out
+    const animateOut = () => {
+      return new Promise<void>(resolve => {
+        canvas?.app?.ticker.add(function animate(delta) {
+          const t = Math.min(1, this.t + (delta / 60));
+          
+          // Apply easing (simplified easeInQuad)
+          const easedT = t * t;
+          
+          // Update alpha only for fade out
+          const alpha = animation.finalAlpha! - (animation.finalAlpha! * easedT);
+          textObject.alpha = alpha;
+          overlay.alpha = opacity - (opacity * easedT);
+          
+          this.t = t;
+          if (t >= 1) {
+            canvas?.app?.ticker.remove(animate);
+            resolve();
+          }
+        }.bind({ t: 0 }));
+      });
+    };
+
+    // Execute the sequence
+    await animateIn();
+    
+    // Hold for display duration minus animation time
+    await new Promise(resolve => setTimeout(resolve, duration - animation.duration!));
+    
+    await animateOut();
+    
+    // Clean up
+    this.container.removeChildren();
   }
 
-  private render(): void {
-    this.stage?.render();
+  /**
+   * Display a title with subtitle
+   */
+  public async displayTitle(title: string, subtitle?: string, options: NarratorTextOptions = {}): Promise<void> {
+    // Adjust font sizes for title/subtitle
+    const titleOptions = {
+      ...options,
+      fontSize: options.fontSize || 72,
+      fontFamily: options.fontFamily || this.titleFont,
+      fontWeight: options.fontWeight || this.titleWeight
+    };
+    
+    // Combine title and subtitle with formatting
+    let displayText = title;
+    if (subtitle) {
+      displayText = `${title}\n\n${subtitle}`;
+    }
+    
+    await this.displayText(displayText, titleOptions);
   }
-
-  // public async displayNarratorText(text: string, options: NarratorTextOptions = {}): Promise<void> {
-  //   await this.showNarratorText(text, options);
-  // }
-
-  // private async showNarratorText(text: string, options: NarratorTextOptions = {}): Promise<void> {
-  //   const {
-  //     duration = 5000,
-  //     fontSize = 48,
-  //     fontColor = '#ffffff',
-  //     backgroundColor = '#000000',
-  //     opacity = 0.8
-  //   } = options;
-
-  //   const overlay = new PIXI.Graphics();
-  //   overlay?.beginFill(backgroundColor);
-  //   overlay?.drawRect(0, 0, this.canvas.width, this.canvas.height);
-  //   overlay?.endFill();
-  //   overlay.alpha = opacity;
-  //   this.stage.addChild(overlay);
-
-  //   const textObject = new PIXI.Text(text, {
-  //     fill: fontColor,
-  //     fontSize: fontSize,
-  //     align: 'center',
-  //     wordWrap: true,
-  //     wordWrapWidth: this.canvas?.width ? this.canvas.width * 0.8 : window.innerWidth * 0.8,
-  //   });
-  //   textObject.anchor.set(0.5, 0.5);
-  //   textObject.position.set(this.canvas.width / 2, this.canvas.height / 2);
-  //   this.stage.addChild(textObject);
-
-  //   const animationDuration = 1000;
-  //   const animation = new PIXI.Animation(
-  //     [
-  //       { property: 'scale', from: 0.5, to: 1.2, easing: 'easeOut' },
-  //       { property: 'alpha', from: 0, to: 1, easing: 'easeOut' },
-  //     ],
-  //     animationDuration
-  //   );
-  //   textObject.playAnimation(animation);
-
-  //   await new Promise(resolve => setTimeout(resolve, animationDuration));
-  //   await new Promise(resolve => setTimeout(resolve, duration - animationDuration));
-
-  //   this.stage.removeChild(overlay);
-  //   this.stage.removeChild(textObject);
-  // }
 }

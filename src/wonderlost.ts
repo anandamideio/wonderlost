@@ -32,13 +32,28 @@ class Wonderlost {
 			}
 		}
 	}
+
+	getModule(moduleName: string) {
+		return this.tomes.get(moduleName as "Toasted" | "Narrator");
+	}
+
+
+	moduleExists(moduleName: string): boolean {
+		return this.tomes.has(moduleName as "Toasted" | "Narrator");
+	}
 }
 
-Hooks.once("setup", async () => {
-	consola.start("Wonderlost | Initialized");
-	new Wonderlost(true).initializeTomes();
-	consola.success("Wonderlost | Ready");
+const wonderlost = new Wonderlost(true);
+
+Hooks.once("setup", () => {
+  console.log("Wonderlost | Setup started");
+  wonderlost.initializeTomes();
+  console.log("Wonderlost | Ready");
+  
+  // Make API available globally for other modules
+  // @ts-ignore
+  game.modules.get("wonderlost").api = wonderlost;
 });
 
-// Hooks.once("ready", async function () { });
+export default wonderlost;
 
