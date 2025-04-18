@@ -121,7 +121,7 @@ export abstract class Tome {
     }
 
     /** Create the isEnabled rule typed to the module so users can disable the module with ease */
-    game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-isEnabled`), {
+    game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-isEnabled`), {
       name: `${this.moduleName} - Is Enabled`,
       hint: 'Is the module enabled?',
       scope: 'world',
@@ -144,7 +144,7 @@ export abstract class Tome {
     });
 
     this.settings.forEach((setting) => {
-      game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-${setting.name}`), {
+      game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${setting.name}`), {
         name: setting.name,
         hint: setting.hint,
         scope: setting.scope,
@@ -174,17 +174,17 @@ export abstract class Tome {
 
   // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   public getSetting<ExpectedReturn = any>(settingName: string) {
-    return game.settings?.get('wonderlost', Tome.kabob(`${this.lowercaseName}-${settingName}`)) as ExpectedReturn;
+    return game.settings?.get('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${settingName}`)) as ExpectedReturn;
   }
 
   public async setSetting(settingName: string, value: unknown) {
-    return game.settings?.set('wonderlost', Tome.kabob(`${this.lowercaseName}-${settingName}`), value);
+    return game.settings?.set('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${settingName}`), value);
   }
 
   public registerSettingSubmenu<Data extends Record<string, unknown> = Record<string, unknown>>(
     menu: RuleMenu & { data: Data },
   ) {
-    game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-allSettings`), {
+    game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-allSettings`), {
       scope: 'world',
       config: false,
       // biome-ignore lint/suspicious/noExplicitAny: <explanation>
@@ -195,7 +195,7 @@ export abstract class Tome {
     const lowercaseName = `${this.lowercaseName}`;
     const moduleName = this.moduleName.toString();
 
-    game.settings?.registerMenu('wonderlost', Tome.kabob(`${this.lowercaseName}-allSettings`), {
+    game.settings?.registerMenu('wonderlost', Tome.kebabCase(`${this.lowercaseName}-allSettings`), {
       name: menu.name,
       label: menu.label,
       hint: menu.hint,
@@ -296,9 +296,12 @@ export abstract class Tome {
     throw new Error(`Expected object but received ${typeof value}`);
   }
 
-  static kabob(str: string) {
+  static kebabCase(str: string): string {
     if (!str) return '';
-    return str.split('').join('-');
+    return str
+      .replace(/([a-z])([A-Z])/g, '$1-$2') // Insert dash between camelCase
+      .replace(/[\s_]+/g, '-') // Replace spaces and underscores with dashes
+      .toLowerCase(); // Convert to lowercase
   }
 
   toJSON() {

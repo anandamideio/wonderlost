@@ -6,48 +6,54 @@ type ToastedTuple = ['Toasted', typeof Toasted];
 type NarratorTuple = ['Narrator', typeof Narrator];
 
 class Wonderlost {
-	public tomes = new Map<
-		"Toasted" | "Narrator",
-		typeof Toasted | typeof Narrator
-	>([
-		["Toasted", Toasted] as ToastedTuple,
-		["Narrator", Narrator] as NarratorTuple,
-	]);
+  public modules = new Map<'Toasted' | 'Narrator', typeof Toasted | typeof Narrator>([
+    ['Toasted', Toasted] as ToastedTuple,
+    ['Narrator', Narrator] as NarratorTuple,
+  ]);
 
-	constructor(public DEBUG = false) {
-		this.DEBUG = DEBUG;
-		if (this.DEBUG) {
-			consola.info("Wonderlost | Initialized", { self: this });
-		}
-	}
+  constructor(public DEBUG = false) {
+    this.DEBUG = DEBUG;
 
-	initializeTomes() {
-		for (const [tomeName, Tome] of this.tomes) {
-			new Tome(this.DEBUG).initialize();
+    if (this.DEBUG) {
+      consola.info('Wonderlost | Initialized', { self: this });
+    }
+  }
 
-			if (this.DEBUG) {
-				consola.info(`Wonderlost | Initialized ${tomeName}`, {
-					Tome: Tome.prototype.toJSON(),
-				});
-			}
-		}
-	}
+  initializeModules() {
+    for (const [tomeName, Tome] of this.modules) {
+      new Tome(this.DEBUG).initialize();
 
-	getModule(moduleName: string) {
-		return this.tomes.get(moduleName as "Toasted" | "Narrator");
-	}
+      if (this.DEBUG) {
+        consola.info(`Wonderlost | Initialized ${tomeName}`, {
+          Tome: Tome.prototype.toJSON(),
+        });
+      }
+    }
+  }
 
+  getModule(moduleName: 'Toasted' | 'Narrator') {
+    return this.modules.get(moduleName);
+  }
 
-	moduleExists(moduleName: string): boolean {
-		return this.tomes.has(moduleName as "Toasted" | "Narrator");
-	}
+  moduleExists(moduleName: 'Toasted' | 'Narrator'): boolean {
+    return this.modules.has(moduleName);
+  }
+
+  getAllModules(): Array<'Toasted' | 'Narrator'> {
+    return Array.from(this.modules.keys());
+  }
+
+  logAllModules() {
+    const modules = this.getAllModules();
+    consola.info('Wonderlost | Available Modules', { modules });
+  }
 }
 
 const wonderlost = new Wonderlost(true);
 
 Hooks.once("setup", () => {
   console.log("Wonderlost | Setup started");
-  wonderlost.initializeTomes();
+  wonderlost.initializeModules();
   console.log("Wonderlost | Ready");
   
   // Make API available globally for other modules

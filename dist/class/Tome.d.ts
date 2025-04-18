@@ -40,7 +40,7 @@ export declare abstract class Tome {
     initializeSocketListeners(): this;
     initialize(): this;
     static expandObject(value: unknown): Record<string, unknown>;
-    static kabob(str: string): string;
+    static kebabCase(str: string): string;
     toJSON(): {
         moduleName: string;
         moduleDescription: string;
