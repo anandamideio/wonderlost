@@ -20,12 +20,12 @@ export declare class Toasted extends Tome {
     }): void;
     protected updateMessage(newNode: ChildNode, oldNode: Node): void;
     protected cloneMessage(original: HTMLElement): HTMLDivElement;
+    protected getElementIndex(element: Element): number;
     static findTarget(originalMessage: HTMLDivElement, event: MouseEvent): {
         target: Element | null;
         x: number;
         y: number;
     };
-    protected getElementIndex(element: Element): number;
 }
 export {};
 //# sourceMappingURL=Toasted.d.ts.map

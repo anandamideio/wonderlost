@@ -65,6 +65,7 @@ export declare abstract class Tome {
     socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
     ready: boolean;
+    enabled: boolean;
     get name(): string;
     get lowercaseName(): string;
     get hasHooks(): boolean;
