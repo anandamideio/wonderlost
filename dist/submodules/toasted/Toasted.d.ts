@@ -10,6 +10,7 @@ export declare class Toasted extends Tome {
     enabled: boolean;
     menu: El<'div', true> | null;
     constructor(DEBUG?: boolean);
+    protected updateSidebarPosition(collapsed: boolean): void;
     protected updateToastPosition(): void;
     static expandSidebarInstant(sidebar: HTMLDivElement): void;
     protected delegateEvent(n: Node, ev: MouseEvent): void;

@@ -164,7 +164,7 @@
 .Toasted.upper-right, #toasted.upper-right {
   position: fixed;
   top: 20px;
-  right: 20px;
+  right: var(--right-offset, 20px); /* Use variable with fallback */
 }
 
 .Toasted.middle-left, #toasted.middle-left {
@@ -184,7 +184,7 @@
 .Toasted.middle-right, #toasted.middle-right {
   position: fixed;
   top: 50%;
-  right: 20px;
+  right: var(--right-offset, 20px); /* Use variable with fallback */
   transform: translateY(-50%);
 }
 
@@ -204,7 +204,7 @@
 .Toasted.lower-right, #toasted.lower-right {
   position: fixed;
   bottom: 20px;
-  right: 20px;
+  right: var(--right-offset, 20px); /* Use variable with fallback */
 }
 
 /* Additional styling for toast messages */

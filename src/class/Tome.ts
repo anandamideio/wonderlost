@@ -2,68 +2,19 @@ import consola from "consola";
 import type ApplicationV2 from "src/types/foundry/client-esm/applications/api/application.mjs";
 import type { DataModel } from "src/types/foundry/common/abstract/module.mjs";
 import type { MaybePromise } from "src/types/types/utils.mjs";
-
-type CoreLifeCycleHooks = "init" | "ready" | "error" | "setup" | "i18nInit";
-
-type HookableEvents =
-	| "renderChatLog"
-	| "renderChatMessage"
-	| "renderApplication"
-	| CoreLifeCycleHooks;
-type HookEvent = (
-	app: Application,
-	html: JQuery,
-	data?: Record<string, unknown>,
-) => void | Promise<void>;
-
-interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {}
-
-interface Rule {
-	name: string;
-	hint?: string;
-	restricted?: boolean;
-	onChange?: (value: unknown) => void | Promise<void>;
-	/** true if you want to prompt the user to reload */
-	requiresReload?: boolean;
-	/**
-	 * @default true
-	 * @comment false if you dont want it to show in module config
-	 */
-	config?: boolean;
-	choices?: Record<string, string>;
-}
-
-// Define rule-specific types
-type NumberRule = Rule & {
-	type: typeof Number;
-	range?: { min?: number; max?: number; step?: number };
-	defaultValue?: number;
-};
-type BooleanRule = Rule & { type: typeof Boolean; defaultValue?: boolean };
-type StringRule = Rule & { type: typeof String; defaultValue?: string };
-type ObjectRule = Rule & {
-	type: typeof Object;
-	defaultValue?: Record<string, unknown>;
-};
-type ArrayRule = Rule & {
-	type: typeof Array;
-	defaultValue?: unknown[];
-};
-type ColorRule = Rule & { type: typeof Color; defaultValue?: string };
-
-// Define the Rules union type
-type Rules =
-	| NumberRule
-	| BooleanRule
-	| StringRule
-	| ObjectRule
-	| ArrayRule
-	| ColorRule;
-
-interface TomeRuleConstructor {
-	globalSettings?: Array<Rules & { scope?: "world" | "client" }>;
-	clientSettings?: Array<Rules & { scope?: "world" | "client" }>;
-}
+import type {
+  ArrayRule,
+  BooleanRule,
+  ColorRule,
+  HookableEvents,
+  HookEvent,
+  NumberRule,
+  ObjectRule,
+  RuleMenu,
+  Rules,
+  StringRule,
+  TomeRuleConstructor,
+} from 'src/types/wonderlost/Tome';
 
 export abstract class Tome {
 		public moduleName: string;
@@ -107,7 +58,7 @@ export abstract class Tome {
 		constructor(
 			pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
 				settings?: TomeRuleConstructor;
-				hooks?: Tome["hooks"];
+				hooks?: Array<[HookableEvents, HookEvent]>;
 				socketFns?: Tome["socketFns"];
 				stylesheets?: Array<string>;
 				/** @default false */
@@ -131,7 +82,7 @@ export abstract class Tome {
 				);
 			}
 
-			this.hooks = pTome?.hooks ?? new Map();
+			this.hooks = pTome?.hooks ? new Map(pTome?.hooks) : new Map();
 			this.socketFns = pTome?.socketFns ?? new Map();
 			this.DEBUG = pTome?.DEBUG ?? false;
 		}
@@ -221,18 +172,20 @@ export abstract class Tome {
 			}
 
 			/** Create the isEnabled rule typed to the module so users can disable the module with ease */
-			game.settings?.register(
-				"wonderlost",
-				Tome.kabob(`${this.lowercaseName}-isEnabled`),
-				{
-					name: "Is Enabled",
-					hint: "Disable this module",
-					scope: "world",
-					config: true,
-					default: true,
-					type: Boolean,
-				},
-			);
+  game.settings?.register('wonderlost', Tome.kabob(`${this.lowercaseName}-isEnabled`), {
+    name: `${this.moduleName} - Is Enabled`,
+    hint: 'Is the module enabled?',
+    scope: 'world',
+    config: true,
+    default: true,
+    type: Boolean,
+    onChange: (value: unknown) => {
+      this.enabled = value as boolean;
+      if (this.DEBUG) {
+        consola.info(`[TOME::${this.moduleName}] => Module enabled: ${value}`);
+      }
+    },
+  });
 
 			this.settings.forEach((setting) => {
 				game.settings?.register(

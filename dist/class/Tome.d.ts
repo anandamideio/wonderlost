@@ -1,67 +1,11 @@
-type CoreLifeCycleHooks = "init" | "ready" | "error" | "setup" | "i18nInit";
-type HookableEvents = "renderChatLog" | "renderChatMessage" | "renderApplication" | CoreLifeCycleHooks;
-type HookEvent = (app: Application, html: JQuery, data?: Record<string, unknown>) => void | Promise<void>;
-interface RuleMenu extends ClientSettings.PartialSettingSubmenuConfig {
-}
-interface Rule {
-    name: string;
-    hint?: string;
-    restricted?: boolean;
-    onChange?: (value: unknown) => void | Promise<void>;
-    /** true if you want to prompt the user to reload */
-    requiresReload?: boolean;
-    /**
-     * @default true
-     * @comment false if you dont want it to show in module config
-     */
-    config?: boolean;
-    choices?: Record<string, string>;
-}
-type NumberRule = Rule & {
-    type: typeof Number;
-    range?: {
-        min?: number;
-        max?: number;
-        step?: number;
-    };
-    defaultValue?: number;
-};
-type BooleanRule = Rule & {
-    type: typeof Boolean;
-    defaultValue?: boolean;
-};
-type StringRule = Rule & {
-    type: typeof String;
-    defaultValue?: string;
-};
-type ObjectRule = Rule & {
-    type: typeof Object;
-    defaultValue?: Record<string, unknown>;
-};
-type ArrayRule = Rule & {
-    type: typeof Array;
-    defaultValue?: unknown[];
-};
-type ColorRule = Rule & {
-    type: typeof Color;
-    defaultValue?: string;
-};
-type Rules = NumberRule | BooleanRule | StringRule | ObjectRule | ArrayRule | ColorRule;
-interface TomeRuleConstructor {
-    globalSettings?: Array<Rules & {
-        scope?: "world" | "client";
-    }>;
-    clientSettings?: Array<Rules & {
-        scope?: "world" | "client";
-    }>;
-}
+import type { HookableEvents, HookEvent, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
 export declare abstract class Tome {
     moduleName: string;
     moduleDescription: string;
     settings: Array<Rules & {
         scope: "world" | "client";
     }>;
-    hooks: Map<HookableEvents, HookEvent>;
+    hooks: Map<"init" | "i18nInit" | "setup" | "ready" | "error" | "hotReload" | "pauseGame" | "updateWorldTime" | "canvasConfig" | "canvasInit" | "canvasPan" | "canvasReady" | "canvasTearDown" | "canvasDraw" | "dropCanvasData" | "highlightObjects" | "renderApplication" | "getApplicationHeaderButtons" | "closeApplication" | "getSceneControlButtons" | "hotbarDrop" | "collapseSceneNavigation" | "getApplicationEntryContext" | "collapseSidebar" | "changeSidebarTab" | "renderChatLog" | "drawGroup" | "tearDownGroup" | "drawLayer" | "tearDownLayer" | "pastePlaceableObject" | "activateLayer" | "deactivateLayer" | "applyActiveEffect" | "updateCompendium" | "preCreateDocument" | "preUpdateDocument" | "preDeleteDocument" | "createDocument" | "updateDocument" | "deleteDocument" | "drawObject" | "refreshObject" | "destroyObject" | "controlObject" | "hoverObject" | "applyTokenStatusEffect" | "chatBubble" | "modifyTokenAttribute" | "targetToken" | "activateNote" | "initializeRenderedEffectSourceShaders" | "dealCards" | "passCards" | "returnCards" | "dropActorSheetData" | "initializeVisionSources" | "lightingRefresh" | "visibilityRefresh" | "initializeLightSources" | "initializeDarknessSources" | "sightRefresh" | "initializeWeatherEffects" | "preImportAdventure" | "importAdventure" | "userConnected" | "combatTurnChange" | "combatStart" | "combatTurn" | "combatRound" | "getProseMirrorMenuDropDowns" | "getProseMirrorMenuItems" | "createProseMirrorEditor" | "chatMessage" | "renderChatMessage" | "globalVolumeChanged" | "rtcSettingsChanged" | "dropRollTableSheetData" | "initializeDynamicTokenRingConfig", HookEvent>;
     socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
     ready: boolean;
@@ -74,7 +18,7 @@ export declare abstract class Tome {
     get needsEarlyInitialization(): boolean;
     constructor(pTome: Pick<Tome, "moduleDescription" | "moduleName"> & {
         settings?: TomeRuleConstructor;
-        hooks?: Tome["hooks"];
+        hooks?: Array<[HookableEvents, HookEvent]>;
         socketFns?: Tome["socketFns"];
         stylesheets?: Array<string>;
         /** @default false */
@@ -104,10 +48,9 @@ export declare abstract class Tome {
         settings: (Rules & {
             scope: "world" | "client";
         })[];
-        hooks: Map<HookableEvents, HookEvent>;
+        hooks: Map<"init" | "i18nInit" | "setup" | "ready" | "error" | "hotReload" | "pauseGame" | "updateWorldTime" | "canvasConfig" | "canvasInit" | "canvasPan" | "canvasReady" | "canvasTearDown" | "canvasDraw" | "dropCanvasData" | "highlightObjects" | "renderApplication" | "getApplicationHeaderButtons" | "closeApplication" | "getSceneControlButtons" | "hotbarDrop" | "collapseSceneNavigation" | "getApplicationEntryContext" | "collapseSidebar" | "changeSidebarTab" | "renderChatLog" | "drawGroup" | "tearDownGroup" | "drawLayer" | "tearDownLayer" | "pastePlaceableObject" | "activateLayer" | "deactivateLayer" | "applyActiveEffect" | "updateCompendium" | "preCreateDocument" | "preUpdateDocument" | "preDeleteDocument" | "createDocument" | "updateDocument" | "deleteDocument" | "drawObject" | "refreshObject" | "destroyObject" | "controlObject" | "hoverObject" | "applyTokenStatusEffect" | "chatBubble" | "modifyTokenAttribute" | "targetToken" | "activateNote" | "initializeRenderedEffectSourceShaders" | "dealCards" | "passCards" | "returnCards" | "dropActorSheetData" | "initializeVisionSources" | "lightingRefresh" | "visibilityRefresh" | "initializeLightSources" | "initializeDarknessSources" | "sightRefresh" | "initializeWeatherEffects" | "preImportAdventure" | "importAdventure" | "userConnected" | "combatTurnChange" | "combatStart" | "combatTurn" | "combatRound" | "getProseMirrorMenuDropDowns" | "getProseMirrorMenuItems" | "createProseMirrorEditor" | "chatMessage" | "renderChatMessage" | "globalVolumeChanged" | "rtcSettingsChanged" | "dropRollTableSheetData" | "initializeDynamicTokenRingConfig", HookEvent>;
         socketFns: Map<string, (data: unknown) => void>;
         DEBUG: boolean | undefined;
     };
 }
-export {};
 //# sourceMappingURL=Tome.d.ts.map

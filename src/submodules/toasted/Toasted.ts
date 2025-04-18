@@ -29,7 +29,7 @@ export class Toasted extends Tome {
     super({
       moduleName: 'Toasted',
       moduleDescription: 'A customizable toast notification system',
-      hooks: new Map([
+      hooks: [
         [
           'renderChatLog',
           async (app, html) => {
@@ -93,7 +93,13 @@ export class Toasted extends Tome {
             }
           },
         ],
-      ]),
+        [
+          'collapseSidebar',
+          async (app, html) => {
+
+          },
+        ],
+      ],
       socketFns: new Map([
         [
           'module.toasted',
@@ -197,6 +203,37 @@ export class Toasted extends Tome {
     this.updateToastPosition();
   }
 
+  protected updateSidebarPosition(collapsed: boolean) {
+    const container = document.querySelector(`.${this.moduleName}`) ?? document.querySelector(`#${this.lowercaseName}`);
+    if (!container) {
+      if (this.DEBUG) consola.error('Toasted | Toast container not found, could not update sidebar position');
+      return;
+    }
+
+    // Skip if not a right-side position
+    if (!this.toastPosition.includes('Right')) return;
+
+    const sidebar = document.getElementById('sidebar');
+    if (!sidebar) {
+      if (this.DEBUG) consola.error('Toasted | Sidebar not found');
+      return;
+    }
+
+    const sidebarWidth = collapsed ? 10 : sidebar.offsetWidth;
+    const rightOffset = sidebarWidth + 20; // 20px padding
+
+    // Apply the right offset as a CSS variable
+    (container as HTMLElement).style.setProperty('--right-offset', `${rightOffset}px`);
+
+    if (this.DEBUG) {
+      consola.info('Toasted | Updated sidebar position', { 
+        collapsed, 
+        sidebarWidth, 
+        rightOffset 
+      });
+    }
+  }
+
   protected updateToastPosition() {
     const container = document.querySelector(`.${this.moduleName}`) ?? document.querySelector(`#${this.lowercaseName}`);
     if (!container){
@@ -214,6 +251,12 @@ export class Toasted extends Tome {
       .replace(/([A-Z])/g, '-$1')
       .toLowerCase();
     container.classList.add(positionClass);
+
+
+    // Update position for sidebar if it's a right-side position
+    if (this.toastPosition.includes('Right')) {
+      this.updateSidebarPosition(ui.sidebar._collapsed);
+    }
 
     consola.info('Toasted | Updated toast position', { positionClass });
   }
