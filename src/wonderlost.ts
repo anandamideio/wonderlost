@@ -21,13 +21,17 @@ class Wonderlost {
 
   initializeModules() {
     for (const [tomeName, Tome] of this.modules) {
-      new Tome(this.DEBUG).initialize();
+			if (this.DEBUG) {
+    		consola.start(`Wonderlost | Initializing ${tomeName}`);
+  		}
 
-      if (this.DEBUG) {
-        consola.info(`Wonderlost | Initialized ${tomeName}`, {
-          Tome: Tome.prototype.toJSON(),
-        });
-      }
+  new Tome(this.DEBUG).initialize();
+
+  if (this.DEBUG) {
+    consola.info(`Wonderlost | Initialized ${tomeName}`, {
+      Tome: Tome.prototype.toJSON(),
+    });
+  }
     }
   }
 

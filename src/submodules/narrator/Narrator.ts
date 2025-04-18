@@ -84,9 +84,10 @@ export class Narrator extends Tome {
 
   constructor(debug = false) {
     super({
-      moduleName: "Narrator",
-      moduleDescription: "Customizable on-screen narrator system",
-      DEBUG: debug
+      moduleName: 'Narrator',
+      moduleDescription: 'Customizable on-screen narrator system',
+
+      DEBUG: debug,
     });
 
     this.registerSettings([

@@ -96,7 +96,11 @@ export class Toasted extends Tome {
         [
           'collapseSidebar',
           async (app, html) => {
+            if (this.DEBUG) {
+              consola.info('Toasted | Collapse sidebar', { app, html });
+            }
 
+            this.updateSidebarPosition(true);
           },
         ],
       ],
