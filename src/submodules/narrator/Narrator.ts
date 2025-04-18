@@ -320,54 +320,54 @@ export class Narrator extends Tome {
   }
 
   private render(): void {
-    this.stage.render();
+    this.stage?.render();
   }
 
-  public async displayNarratorText(text: string, options: NarratorTextOptions = {}): Promise<void> {
-    await this.showNarratorText(text, options);
-  }
+  // public async displayNarratorText(text: string, options: NarratorTextOptions = {}): Promise<void> {
+  //   await this.showNarratorText(text, options);
+  // }
 
-  private async showNarratorText(text: string, options: NarratorTextOptions = {}): Promise<void> {
-    const {
-      duration = 5000,
-      fontSize = 48,
-      fontColor = '#ffffff',
-      backgroundColor = '#000000',
-      opacity = 0.8
-    } = options;
+  // private async showNarratorText(text: string, options: NarratorTextOptions = {}): Promise<void> {
+  //   const {
+  //     duration = 5000,
+  //     fontSize = 48,
+  //     fontColor = '#ffffff',
+  //     backgroundColor = '#000000',
+  //     opacity = 0.8
+  //   } = options;
 
-    const overlay = new PIXI.Graphics();
-    overlay.beginFill(backgroundColor);
-    overlay.drawRect(0, 0, this.canvas.width, this.canvas.height);
-    overlay.endFill();
-    overlay.alpha = opacity;
-    this.stage.addChild(overlay);
+  //   const overlay = new PIXI.Graphics();
+  //   overlay?.beginFill(backgroundColor);
+  //   overlay?.drawRect(0, 0, this.canvas.width, this.canvas.height);
+  //   overlay?.endFill();
+  //   overlay.alpha = opacity;
+  //   this.stage.addChild(overlay);
 
-    const textObject = new PIXI.Text(text, {
-      fill: fontColor,
-      fontSize: fontSize,
-      align: 'center',
-      wordWrap: true,
-      wordWrapWidth: this.canvas.width * 0.8,
-    });
-    textObject.anchor.set(0.5, 0.5);
-    textObject.position.set(this.canvas.width / 2, this.canvas.height / 2);
-    this.stage.addChild(textObject);
+  //   const textObject = new PIXI.Text(text, {
+  //     fill: fontColor,
+  //     fontSize: fontSize,
+  //     align: 'center',
+  //     wordWrap: true,
+  //     wordWrapWidth: this.canvas?.width ? this.canvas.width * 0.8 : window.innerWidth * 0.8,
+  //   });
+  //   textObject.anchor.set(0.5, 0.5);
+  //   textObject.position.set(this.canvas.width / 2, this.canvas.height / 2);
+  //   this.stage.addChild(textObject);
 
-    const animationDuration = 1000;
-    const animation = new PIXI.Animation(
-      [
-        { property: 'scale', from: 0.5, to: 1.2, easing: 'easeOut' },
-        { property: 'alpha', from: 0, to: 1, easing: 'easeOut' },
-      ],
-      animationDuration
-    );
-    textObject.playAnimation(animation);
+  //   const animationDuration = 1000;
+  //   const animation = new PIXI.Animation(
+  //     [
+  //       { property: 'scale', from: 0.5, to: 1.2, easing: 'easeOut' },
+  //       { property: 'alpha', from: 0, to: 1, easing: 'easeOut' },
+  //     ],
+  //     animationDuration
+  //   );
+  //   textObject.playAnimation(animation);
 
-    await new Promise(resolve => setTimeout(resolve, animationDuration));
-    await new Promise(resolve => setTimeout(resolve, duration - animationDuration));
+  //   await new Promise(resolve => setTimeout(resolve, animationDuration));
+  //   await new Promise(resolve => setTimeout(resolve, duration - animationDuration));
 
-    this.stage.removeChild(overlay);
-    this.stage.removeChild(textObject);
-  }
+  //   this.stage.removeChild(overlay);
+  //   this.stage.removeChild(textObject);
+  // }
 }

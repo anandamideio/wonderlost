@@ -36,7 +36,6 @@
   background: var(--div-bg-color);
   padding: 6px;
   margin: 0;
-  margin-bottom: 3px;
   border-bottom: 1px solid var(--border-color);
   margin: 0 0 6px 0;
 }
@@ -51,6 +50,7 @@
 
 .Toasted.settings .info {
   font-weight: 900;
+    /* biome-ignore lint/a11y/useGenericFontNames: <Don't need to for this> */
   font-family: "Font Awesome 5 Free";
   position: relative;
   top: -0.4em;
@@ -95,6 +95,7 @@
 
 .Toasted.settings .form-checkbox-group label:before {
   font-weight: 400;
+  /* biome-ignore lint/a11y/useGenericFontNames: <Don't need to for this> */
   font-family: "Font Awesome 5 Free";
   padding: 0 0.3em;
   content: "\f0c8";

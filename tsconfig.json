@@ -10,11 +10,16 @@
     "emitDecoratorMetadata": true,
     "inlineSourceMap": false,
     "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "sourceMap": true,
     "baseUrl": ".",
     "paths": {
       "/scripts/greensock/esm/*": ["node_modules/gsap/dist/*"]
     },
-    "typeRoots": ["./node_modules/@types", "./types"]
+    "typeRoots": ["./types", "./node_modules/@types"],
   },
   "include": ["src/**/*.ts", "test/**/*.test.ts", "vitest.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }
