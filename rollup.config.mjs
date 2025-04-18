@@ -10,13 +10,15 @@ export default {
     sourcemap: true,
     name: 'Wonderlost',
     format: 'esm',
-    plugins: [terser()]
+    plugins: [
+      terser({
+        mangle: false,
+      }),
+    ],
   },
   plugins: [
     alias({
-      entries: [
-        { find: "/scripts/greensock/esm/all.js", replacement: "../../../scripts/greensock/esm/all.js" },
-      ]
+      entries: [{ find: '/scripts/greensock/esm/all.js', replacement: '../../../scripts/greensock/esm/all.js' }],
     }),
     resolve({
       browser: true,
@@ -25,11 +27,8 @@ export default {
       sourceMap: true,
       inlineSources: true,
       tsconfig: 'tsconfig.json',
-      cacheDir: '.cache'
+      cacheDir: '.cache',
     }),
   ],
-  external: [
-    "/scripts/greensock/esm/all.js",
-    "../../../scripts/greensock/esm/all.js"
-  ],
-}
+  external: ['/scripts/greensock/esm/all.js', '../../../scripts/greensock/esm/all.js'],
+};
