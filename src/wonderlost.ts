@@ -22,9 +22,7 @@ class Wonderlost {
   initializeModules() {
     for (const [tomeName, Tome] of this.modules) {
       if (this.DEBUG) {
-        consola.start(`Wonderlost | Initializing ${tomeName}`, {
-          Tome: Tome.prototype.toJSON(),
-        });
+        consola.start(`Wonderlost | Initializing ${tomeName}`);
       }
 
       new Tome(this.DEBUG).initialize();
