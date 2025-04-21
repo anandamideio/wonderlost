@@ -1,14 +1,17 @@
 import consola from 'consola';
 import { Narrator } from './submodules/narrator/Narrator';
 import { Toasted } from './submodules/toasted/Toasted';
+import { SceneCreator } from './submodules/scenery/SceneCreator';
 
 type ToastedTuple = ['Toasted', typeof Toasted];
 type NarratorTuple = ['Narrator', typeof Narrator];
+type SceneryTuple = ['Scenery', typeof SceneCreator];
 
 class Wonderlost {
-  public modules = new Map<'Toasted' | 'Narrator', typeof Toasted | typeof Narrator>([
+  public modules = new Map<'Toasted' | 'Narrator' | 'Scenery', typeof Toasted | typeof Narrator | typeof SceneCreator>([
     ['Toasted', Toasted] as ToastedTuple,
     ['Narrator', Narrator] as NarratorTuple,
+    ['Scenery', SceneCreator] as SceneryTuple,
   ]);
 
   constructor(public DEBUG = false) {
@@ -37,15 +40,17 @@ class Wonderlost {
     }
   }
 
-  getModule(moduleName: 'Toasted' | 'Narrator') {
+  getModule(
+    moduleName: 'Toasted' | 'Narrator' | 'Scenery',
+  ): typeof Toasted | typeof Narrator | typeof SceneCreator | undefined {
     return this.modules.get(moduleName);
   }
 
-  moduleExists(moduleName: 'Toasted' | 'Narrator'): boolean {
+  moduleExists(moduleName: 'Toasted' | 'Narrator' | 'Scenery'): boolean {
     return this.modules.has(moduleName);
   }
 
-  getAllModules(): Array<'Toasted' | 'Narrator'> {
+  getAllModules(): Array<'Toasted' | 'Narrator' | 'Scenery'> {
     return Array.from(this.modules.keys());
   }
 

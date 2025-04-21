@@ -60,7 +60,7 @@ export declare abstract class Tome {
     initializeSettings(): this;
     protected onModuleEnabled(): void;
     protected onModuleDisabled(): void;
-    getSetting<ExpectedReturn = any>(settingName: string): ExpectedReturn;
+    getSetting<ExpectedReturn = unknown>(settingName: string): ExpectedReturn;
     setSetting(settingName: string, value: unknown): Promise<unknown>;
     registerSettingSubmenu<Data extends Record<string, unknown> = Record<string, unknown>>(menu: RuleMenu & {
         data: Data;

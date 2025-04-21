@@ -212,8 +212,7 @@ export abstract class Tome {
     // Default implementation - override in subclasses if needed
   }
 
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  public getSetting<ExpectedReturn = any>(settingName: string) {
+  public getSetting<ExpectedReturn = unknown>(settingName: string) {
     return game.settings?.get('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${settingName}`)) as ExpectedReturn;
   }
 
