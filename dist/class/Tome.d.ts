@@ -10,6 +10,8 @@ export declare abstract class Tome {
     DEBUG?: boolean;
     ready: boolean;
     enabled: boolean;
+    dependencies: Array<string>;
+    private static registry;
     get name(): string;
     get lowercaseName(): string;
     /**
@@ -51,7 +53,27 @@ export declare abstract class Tome {
         stylesheets?: Array<string>;
         /** @default false */
         DEBUG?: boolean;
+        /** Dependencies on other Tomes */
+        dependencies?: string[];
     });
+    /**
+     * Get a reference to another Tome by name
+     * @param tomeName The name of the Tome to get
+     * @returns The requested Tome instance or undefined if not found
+     */
+    getTome<T extends Tome = Tome>(tomeName: string): T | undefined;
+    /**
+     * Check if a Tome is initialized
+     * @param tomeName The name of the Tome to check
+     * @returns Whether the Tome is initialized and ready
+     */
+    isTomeReady(tomeName: string): boolean;
+    /**
+     * Add a hook for a specific event
+     * @param event The event to hook into
+     * @param callback The function to call when the event is triggered
+     * @param overwrite Whether to overwrite an existing hook for the event
+     */
     addHook(event: HookableEvents | `once:${HookableEvents}`, callback: HookEvent, overwrite?: boolean): void;
     initializeHooks(): this;
     registerSettings(rules: Array<Rules & {
@@ -67,6 +89,11 @@ export declare abstract class Tome {
     }): void;
     initializeSocketListeners(): this;
     initialize(): this;
+    /**
+     * Check if all dependencies are ready
+     * @returns Whether all dependencies are initialized and ready
+     */
+    areDependenciesReady(): boolean;
     static expandObject(value: unknown): Record<string, unknown>;
     static kebabCase(str: string): string;
     toJSON(): {

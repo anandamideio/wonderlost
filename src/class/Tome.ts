@@ -13,6 +13,10 @@ export abstract class Tome {
   public ready = false;
   public enabled = true;
 
+  public dependencies: Array<string> = [];
+
+  private static registry = new Map<string, Tome>();
+
   get name() {
     return this.moduleName;
   }
@@ -90,6 +94,8 @@ export abstract class Tome {
       stylesheets?: Array<string>;
       /** @default false */
       DEBUG?: boolean;
+      /** Dependencies on other Tomes */
+      dependencies?: string[];
     },
   ) {
     this.moduleName = pTome.moduleName;
@@ -112,8 +118,36 @@ export abstract class Tome {
     this.hooks = pTome?.hooks ? new Map(pTome?.hooks) : new Map();
     this.socketFns = pTome?.socketFns ?? new Map();
     this.DEBUG = pTome?.DEBUG ?? false;
+    this.dependencies = pTome?.dependencies ?? [];
+
+    Tome.registry.set(this.moduleName, this);
   }
 
+  /**
+   * Get a reference to another Tome by name
+   * @param tomeName The name of the Tome to get
+   * @returns The requested Tome instance or undefined if not found
+   */
+  public getTome<T extends Tome = Tome>(tomeName: string): T | undefined {
+    return Tome.registry.get(tomeName) as T | undefined;
+  }
+
+  /**
+   * Check if a Tome is initialized
+   * @param tomeName The name of the Tome to check
+   * @returns Whether the Tome is initialized and ready
+   */
+  public isTomeReady(tomeName: string): boolean {
+    const tome = Tome.registry.get(tomeName);
+    return tome?.ready || false;
+  }
+
+  /**
+   * Add a hook for a specific event
+   * @param event The event to hook into
+   * @param callback The function to call when the event is triggered
+   * @param overwrite Whether to overwrite an existing hook for the event
+   */
   public addHook(event: HookableEvents | `once:${HookableEvents}`, callback: HookEvent, overwrite = false) {
     if (!this.hooks.has(event) || overwrite) {
       this.hooks.set(event, callback);
@@ -311,6 +345,14 @@ export abstract class Tome {
     this.ready = true;
 
     return this;
+  }
+
+  /**
+   * Check if all dependencies are ready
+   * @returns Whether all dependencies are initialized and ready
+   */
+  public areDependenciesReady(): boolean {
+    return this.dependencies.every((dep) => this.isTomeReady(dep));
   }
 
   // Utility function to expand object rules
