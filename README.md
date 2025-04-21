@@ -2,100 +2,117 @@
 
 ![Foundry v12](https://img.shields.io/badge/Foundry-v12-informational)
 
-Wonderlost is a collection of modules for Foundry VTT designed to enhance your gaming experience. It includes features like toast notifications for chat messages and storytelling tools for GMs.
-Wonderlost is built with modularity in mind, allowing you to easily add or remove features as needed.
+Wonderlost is a modular enhancement suite for Foundry VTT that improves your gaming experience with features like toast notifications for chat messages and powerful storytelling tools for Game Masters.
 
-## Architecture
+## Features
 
-Wonderlost is built around a central concept called **Tomes**. Each Tome is a self-contained module that provides specific functionality:
+### Modular Architecture
 
-```txt
-Wonderlost
-├── Core
-│   ├── Tome.ts (base class)
-│   └── WonderErrors.ts
-└── Submodules
-    ├── Toasted (chat notifications)
-    └── Narrator (storytelling tools)
-```
+Wonderlost is built around a powerful concept called **Tomes** - self-contained modules that provide specific functionality while sharing a common framework:
 
-### Core Concepts
+- **Plug-and-Play Design**: Enable or disable modules as needed
+- **Consistent Interface**: All modules follow the same pattern for settings and configuration
+- **Extensible System**: Create your own Tomes with minimal boilerplate code
 
-- **Tome**: The base class for all sub-modules, providing standardized methods for:
-  - Settings management
-  - Hook registration
-  - Socket communication
-  - Stylesheet loading
-  - Debugging support
+### Current Modules
 
-## Submodules
+#### Toasted
 
-### Toasted
+Toasted provides toast notifications for chat messages, making it easier to keep track of what's happening without keeping the chat log open.
 
-Toasted provides elegant toast notifications for chat messages, making it easier to keep track of what's happening without keeping the chat log open.
+- **Position Control**: 9 customizable positions on screen
+- **Appearance Settings**: Customize duration, quantity, and behavior
+- **Interactive**: Click notifications to jump to the original message
+- **Unobtrusive**: Perfect for keeping track of rolls and messages
 
-#### Features
+#### Narrator
 
-- **Position Control**: Place notifications in any of 9 positions on screen (upper/middle/lower × left/center/right)
-- **Customizable Duration**: Set how long notifications remain visible (1-10 seconds)
-- **Message Limit**: Control maximum number of messages displayed simultaneously (1-10)
-- **Interactive**: Click on notifications to interact with the original chat message
-- **Smart Behavior**: Option to show notifications even when chat is already open
+Enhanced storytelling tools that help GMs create immersive narrative experiences.
 
-#### Configuration
-
-Toasted provides user-configurable settings through the module settings panel:
-
-| Setting | Description |
-|---------|-------------|
-| Toast Duration | How long messages remain visible (1000-10000ms) |
-| Max Messages | Maximum number of simultaneous toast messages (1-10) |
-| Always Show Notifications | Display toasts even when chat panel is open |
-| Toast Position | Where on screen toasts appear |
-
-### Narrator
-
-A powerful tool for GMs to enhance storytelling with stylized text and visual effects.
-
-#### Features
-
-- Custom fonts for thematic text displays
-- Scene-setting tools
-- NPC dialog formatting
-- And more!
+- **Custom Fonts**: Apply thematic text styling to create mood
+- **Scene-Setting Tools**: Create atmospheric descriptions
+- **NPC Dialog Formatting**: Distinguished text styles for different characters
+- **Visual Effects**: Add emphasis to important moments
 
 ## Installation
 
-1. In Foundry VTT, navigate to the Add-on Modules tab
-2. Click "Install Module"
-3. Search for "Wonderlost" or paste the manifest URL: `https://github.com/anandamideio/wonderlost/releases/latest/download/module.json`
-4. Click "Install"
+### Requirements
 
-## Usage
+- Foundry VTT v12 or newer
+- Required modules:
+  - [lib-wrapper](https://github.com/ruipin/fvtt-lib-wrapper)
+  - [socketlib](https://github.com/manuelVo/foundryvtt-socketlib)
 
-After installation, Wonderlost and its submodules will be automatically initialized. Each submodule can be configured through the module settings panel in Foundry VTT.
+### Installation Methods
 
-### Development
+#### Method 1: Foundry Package Browser
 
-If you're interested in extending Wonderlost with your own Tomes, the base architecture makes it straightforward:
+1. Open Foundry VTT
+2. Navigate to the "Add-on Modules" tab
+3. Click "Install Module"
+4. Search for "Wonderlost" and click Install
+
+#### Method 2: Manual Installation
+
+1. Copy the manifest URL: `https://github.com/anandamideio/wonderlost/releases/latest/download/module.json`
+2. Open Foundry VTT
+3. Navigate to the "Add-on Modules" tab
+4. Click "Install Module"
+5. Paste the manifest URL in the "Manifest URL" field
+6. Click "Install"
+
+## Configuration
+
+Each module can be configured through the module settings panel in Foundry VTT:
+
+1. Go to "Game Settings"
+2. Click "Configure Settings"
+3. Navigate to the "Wonderlost" section
+4. Configure individual modules as desired
+
+## Developer Documentation
+
+### Creating Your Own Tome
+
+Wonderlost's architecture makes it easy to create your own modules:
 
 ```typescript
+// MyCustomTome.ts
+import { Tome } from 'wonderlost';
+
 export class MyCustomTome extends Tome {
   constructor(DEBUG = false) {
     super({
       moduleName: 'MyCustomTome',
       moduleDescription: 'My custom functionality',
-      hooks: new Map([
-        // Your hooks here
-      ]),
+      hooks: [
+        ['renderChatLog', (app, html) => {
+          // Your hook implementation
+        }],
+        ['ready', () => {
+          // Setup on Foundry ready
+        }]
+      ],
       settings: {
-        // Your settings here
+        globalSettings: [{
+          name: 'mySetting',
+          hint: 'A custom setting',
+          type: String,
+          defaultValue: 'default',
+          choices: {
+            'default': 'Default Option',
+            'alternate': 'Alternate Option'
+          },
+          onChange: (value) => {
+            // Handle setting change
+          }
+        }]
       },
-      DEBUG,
+      DEBUG
     });
   }
   
-  // Your custom methods here
+  // Your custom methods
 }
 ```
 
