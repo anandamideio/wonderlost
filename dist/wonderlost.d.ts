@@ -5,7 +5,7 @@ import type { Tome } from './class/Tome';
 import { Limbo } from './submodules/limbo/Limbo';
 declare class Wonderlost {
     DEBUG: boolean;
-    modules: Map<"Narrator" | "Toasted" | "Limbo" | "Scenery", typeof Narrator | typeof Toasted | typeof SceneCreator | typeof Limbo>;
+    modules: Map<"Narrator" | "Toasted" | "Scenery" | "Limbo", typeof Narrator | typeof Toasted | typeof SceneCreator | typeof Limbo>;
     moduleInstances: Map<string, Tome>;
     constructor(DEBUG?: boolean);
     initializeModules(): void;

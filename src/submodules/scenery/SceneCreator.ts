@@ -4,7 +4,7 @@ import { Tome } from 'src/class/Tome';
 export class SceneCreator extends Tome {
   constructor(DEBUG = false) {
     super({
-      moduleName: 'SceneCreator',
+      moduleName: 'Scenery',
       moduleDescription: 'A module for creating and managing scenes',
       DEBUG,
       hooks: [
