@@ -115,6 +115,8 @@ export class Toasted extends Tome {
                 }
               | undefined;
 
+              consola.info('TOASTED:DEBUG -> This is the socketFN', { data });
+
             if (this.alwaysShowNotifications) {
               toast = ui.notifications?.info(data);
 
