@@ -8,6 +8,8 @@ export declare class Toasted extends Tome {
     toastPosition: ToastPosition;
     ToastedReady: boolean;
     enabled: boolean;
+    private processedMessages;
+    private messageThrottleTime;
     menu: El<'div', true> | null;
     constructor(DEBUG?: boolean);
     protected updateSidebarPosition(collapsed: boolean): void;

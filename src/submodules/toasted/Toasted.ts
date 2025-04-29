@@ -23,6 +23,9 @@ export class Toasted extends Tome {
   public ToastedReady = false;
   public enabled = true;
 
+  private processedMessages = new Set<string>();
+  private messageThrottleTime = 500; // ms
+
   public menu: El<'div', true> | null = null;
 
   constructor(DEBUG = false) {
@@ -79,15 +82,32 @@ export class Toasted extends Tome {
         [
           'renderChatMessage',
           async (_app, html, _options) => {
-            if (this.enabled === false){
-              if (this.DEBUG){
-                consola.info('Toasted | Disabled, would\'ve rendered a message')
+            if (this.enabled === false) {
+              if (this.DEBUG) {
+                consola.info("Toasted | Disabled, would've rendered a message");
               }
               return;
             }
 
+            if (this.DEBUG) {
+              consola.info('Toasted | Render chat message', { html });
+            }
+
             if (this.ready && this.ToastedReady) {
               const original = html[0];
+              const messageID = original.dataset.messageId;
+
+              if (messageID && this.processedMessages.has(messageID)) {
+                if (this.DEBUG) {
+                  consola.info('Toasted | Skipping duplicate message', { messageID });
+                }
+                return;
+              }
+
+              if (messageID) {
+                this.processedMessages.add(messageID);
+              }
+
               const clone = this.cloneMessage(original);
               this.addMessage(clone);
             }
@@ -115,7 +135,7 @@ export class Toasted extends Tome {
                 }
               | undefined;
 
-              consola.info('TOASTED:DEBUG -> This is the socketFN', { data });
+            consola.info('TOASTED:DEBUG -> This is the socketFN', { data });
 
             if (this.alwaysShowNotifications) {
               toast = ui.notifications?.info(data);
@@ -232,32 +252,39 @@ export class Toasted extends Tome {
     (container as HTMLElement).style.setProperty('--right-offset', `${rightOffset}px`);
 
     if (this.DEBUG) {
-      consola.info('Toasted | Updated sidebar position', { 
-        collapsed, 
-        sidebarWidth, 
-        rightOffset 
+      consola.info('Toasted | Updated sidebar position', {
+        collapsed,
+        sidebarWidth,
+        rightOffset,
       });
     }
   }
 
   protected updateToastPosition() {
     const container = document.querySelector(`.${this.moduleName}`) ?? document.querySelector(`#${this.lowercaseName}`);
-    if (!container){
+    if (!container) {
       consola.error('Toasted | Toast container not found, could not update its position', { container });
       return;
     }
-    
-    // Remove any existing position classes
-    const positionClasses = ['upper-left', 'upper-center', 'upper-right', 'middle-left', 'middle-center', 'middle-right', 'lower-left', 'lower-center', 'lower-right'];
-    
-    container.classList.remove(...positionClasses);
-    
-    // Add the new position class (convert camelCase to kebab-case)
-    const positionClass = this.toastPosition
-      .replace(/([A-Z])/g, '-$1')
-      .toLowerCase();
-    container.classList.add(positionClass);
 
+    // Remove any existing position classes
+    const positionClasses = [
+      'upper-left',
+      'upper-center',
+      'upper-right',
+      'middle-left',
+      'middle-center',
+      'middle-right',
+      'lower-left',
+      'lower-center',
+      'lower-right',
+    ];
+
+    container.classList.remove(...positionClasses);
+
+    // Add the new position class (convert camelCase to kebab-case)
+    const positionClass = this.toastPosition.replace(/([A-Z])/g, '-$1').toLowerCase();
+    container.classList.add(positionClass);
 
     // Update position for sidebar if it's a right-side position
     if (this.toastPosition.includes('Right')) {
@@ -294,8 +321,8 @@ export class Toasted extends Tome {
       return;
     }
 
-  // Look for the ORIGINAL message in the main chat log, not in the toast container
-  const originalCard = document.querySelector(`#chat-log .message[data-message-id="${messageId}"]`) as HTMLDivElement;
+    // Look for the ORIGINAL message in the main chat log, not in the toast container
+    const originalCard = document.querySelector(`#chat-log .message[data-message-id="${messageId}"]`) as HTMLDivElement;
 
     // Card not found? strange.. just return
     if (!originalCard) {
@@ -324,14 +351,14 @@ export class Toasted extends Tome {
       clientY: y,
     });
 
-  if (this.DEBUG) {
-    consola.info(`${this.moduleName} | Delegating event to chat log`, {
-      target,
-      x,
-      y,
-      event
-    });
-  }
+    if (this.DEBUG) {
+      consola.info(`${this.moduleName} | Delegating event to chat log`, {
+        target,
+        x,
+        y,
+        event,
+      });
+    }
 
     target.dispatchEvent(event);
   }
@@ -451,12 +478,13 @@ export class Toasted extends Tome {
     const target = (event.target as HTMLElement).closest('[data-interact-id]');
     if (!target || !(target as HTMLElement).dataset.interactId) return { target: null, x: 0, y: 0 };
 
-    const matchingElement = originalMessage.querySelector(`[data-interact-id="${(target as HTMLElement).dataset.interactId}"]`);
+    const matchingElement = originalMessage.querySelector(
+      `[data-interact-id="${(target as HTMLElement).dataset.interactId}"]`,
+    );
     return {
       target: matchingElement,
       x: event.clientX,
       y: event.clientY,
     };
   }
-
 }
