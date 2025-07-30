@@ -114,6 +114,32 @@ class Wonderlost {
     const modules = this.getAllModules();
     consola.info('Wonderlost | Available Modules', { modules });
   }
+
+  public shutdownModules(): void {
+    if (this.DEBUG) {
+      consola.start('Wonderlost | Shutting down modules');
+    }
+    
+    // Get modules in reverse initialization order to properly handle dependencies
+    const shutdownOrder = this.resolveDependencyOrder().reverse();
+    
+    for (const tomeName of shutdownOrder) {
+      if (this.DEBUG) {
+        consola.info(`Wonderlost | Shutting down ${tomeName}`);
+      }
+      
+      const module = this.moduleInstances.get(tomeName);
+      if (!module) continue;
+      
+      // Call destroy to clean up resources
+      if (typeof module.destroy === 'function') {
+        module.destroy();
+      }
+    }
+    
+    // Clear all module instances
+    this.moduleInstances.clear();
+  }
 }
 
 const wonderlost = new Wonderlost(true);
@@ -127,6 +153,10 @@ Hooks.once('setup', () => {
   // Make API available globally for other modules
   // @ts-ignore
   game.modules.get('wonderlost').api = wonderlost;
+
+  window.addEventListener('beforeunload', () => {
+    wonderlost.shutdownModules();
+  });
 });
 
 export default wonderlost;

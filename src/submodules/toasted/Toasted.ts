@@ -1,15 +1,15 @@
 import { El } from '@magik_io/mote';
 import consola from 'consola';
-import { Tome } from '../../class/Tome';
 // @ts-ignore
 import { TweenMax } from '/scripts/greensock/esm/all.js';
+import { Tome } from '../../class/Tome';
 
-type ToastPosition = 
-  | 'upperLeft' 
-  | 'upperCenter' 
-  | 'upperRight' 
-  | 'middleLeft' 
-  | 'middleCenter' 
+type ToastPosition =
+  | 'upperLeft'
+  | 'upperCenter'
+  | 'upperRight'
+  | 'middleLeft'
+  | 'middleCenter'
   | 'middleRight'
   | 'lowerLeft'
   | 'lowerCenter'
@@ -25,6 +25,7 @@ export class Toasted extends Tome {
 
   private processedMessages = new Set<string>();
   private messageThrottleTime = 500; // ms
+  private readonly MAX_PROCESSED_MESSAGES = 100;
 
   public menu: El<'div', true> | null = null;
 
@@ -106,6 +107,7 @@ export class Toasted extends Tome {
 
               if (messageID) {
                 this.processedMessages.add(messageID);
+                this.cleanupProcessedMessages();
               }
 
               const clone = this.cloneMessage(original);
@@ -486,5 +488,21 @@ export class Toasted extends Tome {
       x: event.clientX,
       y: event.clientY,
     };
+  }
+
+  private cleanupProcessedMessages(): void {
+    if (this.processedMessages.size > this.MAX_PROCESSED_MESSAGES) {
+      // Convert to array, keep only the most recent messages
+      const messagesArray = Array.from(this.processedMessages);
+      const toRemove = messagesArray.slice(0, messagesArray.length - this.MAX_PROCESSED_MESSAGES);
+      
+      for (const messageId of toRemove) {
+        this.processedMessages.delete(messageId);
+      }
+      
+      if (this.DEBUG) {
+        consola.info(`Toasted | Cleaned up ${toRemove.length} old message references`);
+      }
+    }
   }
 }

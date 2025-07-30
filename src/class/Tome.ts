@@ -1,7 +1,7 @@
 import consola from 'consola';
 import type { DataModel } from 'src/types/foundry/common/abstract/module.mjs';
 import type { MaybePromise } from 'src/types/types/utils.mjs';
-import type { HookEvent, HookableEvents, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
+import type { HookableEvents, HookEvent, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
 
 export abstract class Tome {
   public moduleName: string;
@@ -16,6 +16,7 @@ export abstract class Tome {
   public dependencies: Array<string> = [];
 
   private static registry = new Map<string, Tome>();
+  private registeredHookIDs: Array<{event: string, id: number}> = [];
 
   get name() {
     return this.moduleName;
@@ -156,10 +157,41 @@ export abstract class Tome {
     }
   }
 
+  /**
+   * Remove a hook for a specific event
+   * @param event The event to remove the hook from
+   */
+  public removeHook(event: HookableEvents | `once:${HookableEvents}`) {
+    if (this.hooks.has(event)) {
+      this.hooks.delete(event);
+    } else {
+      consola.warn(`No hook found for event "${event}".`);
+    }
+  }
+
+  /**
+   * Remove all hooks registered by this Tome
+   */
+  public removeAllHooks() {
+    if (this.DEBUG) {
+      consola.info(`[TOME::${this.moduleName}] => Removing ${this.registeredHookIDs.length} hooks`);
+    }
+
+    this.registeredHookIDs.forEach(({event, id}) => {
+      Hooks.off(event, id);
+    });
+
+    this.registeredHookIDs = [];
+
+    this.hooks.clear();
+
+    return this;
+  }
+
   public initializeHooks() {
     this.hooks.forEach((callback, event) => {
       if (this.DEBUG) {
-        console.log(`[TOME::${this.moduleName}] => Registering hook for ${event}`);
+        consola.info(`[TOME::${this.moduleName}] => Registering hook for ${event}`);
       }
 
       const isOnce = event.startsWith('once:');
@@ -171,11 +203,15 @@ export abstract class Tome {
         return callback(...args);
       };
 
+      let hookID: number;
       if (isOnce) {
-        Hooks.once(actualEvent, wrappedCallback);
+        hookID = Hooks.once(actualEvent, wrappedCallback);
       } else {
-        Hooks.on(actualEvent, wrappedCallback);
+        hookID = Hooks.on(actualEvent, wrappedCallback);
       }
+
+      // Store the ID of the hook for later removal
+      this.registeredHookIDs.push({event: actualEvent, id: hookID});
     });
 
     return this;
@@ -224,7 +260,7 @@ export abstract class Tome {
         scope: setting.scope,
         config: true,
         default: setting?.defaultValue,
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        // biome-ignore lint/suspicious/noExplicitAny: <any is expected here>
         type: setting.type as unknown as any,
         // @ts-ignore -> These are only there when the type is correct, but TS doesn't know that
         choices: setting?.choices,
@@ -238,12 +274,36 @@ export abstract class Tome {
     return this;
   }
 
+  public static unregisterTome(tomeName: string): boolean {
+    return this.registry.delete(tomeName);
+  }
+
+  public destroy(): void {
+    if (this.DEBUG) {
+      console.log(`[TOME::${this.moduleName}] => Destroying module`);
+    }
+
+    // Remove from registry
+    Tome.unregisterTome(this.moduleName);
+
+    // Clean up hooks
+    this.removeAllHooks();
+
+    // Clear collections
+    this.hooks.clear();
+    this.socketFns.clear();
+
+    // Mark as not ready
+    this.ready = false;
+    this.enabled = false;
+  }
+
   protected onModuleEnabled(): void {
     // Default implementation - override in subclasses if needed
   }
 
   protected onModuleDisabled(): void {
-    // Default implementation - override in subclasses if needed
+    this.removeAllHooks();
   }
 
   public getSetting<ExpectedReturn = unknown>(settingName: string) {
@@ -260,7 +320,7 @@ export abstract class Tome {
     game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-allSettings`), {
       scope: 'world',
       config: false,
-      // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+      // biome-ignore lint/suspicious/noExplicitAny: <any is fine here>
       type: Object as unknown as DataModel<any, any>,
       default: menu.data,
     });
