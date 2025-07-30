@@ -1,9 +1,9 @@
 import consola from 'consola';
-import { Narrator } from './submodules/narrator/Narrator';
-import { Toasted } from './submodules/toasted/Toasted';
-import { SceneCreator } from './submodules/scenery/SceneCreator';
 import type { Tome } from './class/Tome';
 import { Limbo } from './submodules/limbo/Limbo';
+import { Narrator } from './submodules/narrator/Narrator';
+import { SceneCreator } from './submodules/scenery/SceneCreator';
+import { Toasted } from './submodules/toasted/Toasted';
 
 type ToastedTuple = ['Toasted', typeof Toasted];
 type NarratorTuple = ['Narrator', typeof Narrator];
@@ -118,7 +118,7 @@ class Wonderlost {
 
 const wonderlost = new Wonderlost(true);
 
-Hooks.once("setup", () => {
+Hooks.once('setup', () => {
   consola.start('Wonderlost | Setup started');
   wonderlost.initializeModules();
   wonderlost.logAllModules();
@@ -130,4 +130,3 @@ Hooks.once("setup", () => {
 });
 
 export default wonderlost;
-
