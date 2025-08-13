@@ -10,6 +10,7 @@ export declare class Toasted extends Tome {
     enabled: boolean;
     private processedMessages;
     private messageThrottleTime;
+    private readonly MAX_PROCESSED_MESSAGES;
     menu: El<'div', true> | null;
     constructor(DEBUG?: boolean);
     protected updateSidebarPosition(collapsed: boolean): void;
@@ -30,6 +31,7 @@ export declare class Toasted extends Tome {
         x: number;
         y: number;
     };
+    private cleanupProcessedMessages;
 }
 export {};
 //# sourceMappingURL=Toasted.d.ts.map

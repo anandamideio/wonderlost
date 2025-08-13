@@ -1,4 +1,4 @@
-import type { HookEvent, HookableEvents, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
+import type { HookableEvents, HookEvent, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
 export declare abstract class Tome {
     moduleName: string;
     moduleDescription: string;
@@ -12,6 +12,7 @@ export declare abstract class Tome {
     enabled: boolean;
     dependencies: Array<string>;
     private static registry;
+    private registeredHookIDs;
     get name(): string;
     get lowercaseName(): string;
     /**
@@ -75,11 +76,22 @@ export declare abstract class Tome {
      * @param overwrite Whether to overwrite an existing hook for the event
      */
     addHook(event: HookableEvents | `once:${HookableEvents}`, callback: HookEvent, overwrite?: boolean): void;
+    /**
+     * Remove a hook for a specific event
+     * @param event The event to remove the hook from
+     */
+    removeHook(event: HookableEvents | `once:${HookableEvents}`): void;
+    /**
+     * Remove all hooks registered by this Tome
+     */
+    removeAllHooks(): this;
     initializeHooks(): this;
     registerSettings(rules: Array<Rules & {
         scope: 'world' | 'client';
     }>): Tome;
     initializeSettings(): this;
+    static unregisterTome(tomeName: string): boolean;
+    destroy(): void;
     protected onModuleEnabled(): void;
     protected onModuleDisabled(): void;
     getSetting<ExpectedReturn = unknown>(settingName: string): ExpectedReturn;

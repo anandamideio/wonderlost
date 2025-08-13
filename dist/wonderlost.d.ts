@@ -1,11 +1,11 @@
-import { Narrator } from './submodules/narrator/Narrator';
-import { Toasted } from './submodules/toasted/Toasted';
-import { SceneCreator } from './submodules/scenery/SceneCreator';
 import type { Tome } from './class/Tome';
 import { Limbo } from './submodules/limbo/Limbo';
+import { Narrator } from './submodules/narrator/Narrator';
+import { SceneCreator } from './submodules/scenery/SceneCreator';
+import { Toasted } from './submodules/toasted/Toasted';
 declare class Wonderlost {
     DEBUG: boolean;
-    modules: Map<"Narrator" | "Toasted" | "Scenery" | "Limbo", typeof Narrator | typeof Toasted | typeof SceneCreator | typeof Limbo>;
+    modules: Map<"Scenery" | "Limbo" | "Narrator" | "Toasted", typeof SceneCreator | typeof Limbo | typeof Narrator | typeof Toasted>;
     moduleInstances: Map<string, Tome>;
     constructor(DEBUG?: boolean);
     initializeModules(): void;
@@ -14,6 +14,7 @@ declare class Wonderlost {
     moduleExists(moduleName: string): boolean;
     getAllModules(): string[];
     logAllModules(): void;
+    shutdownModules(): void;
 }
 declare const wonderlost: Wonderlost;
 export default wonderlost;
