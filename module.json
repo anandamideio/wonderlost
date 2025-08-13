@@ -13,8 +13,9 @@
   ],
   "type": "module",
   "compatibility": {
-    "minimum": "13",
-    "verified": "13"
+    "minimum": "12",
+    "verified": "12",
+    "maximum": "13"
   },
   "authors": [
     {
