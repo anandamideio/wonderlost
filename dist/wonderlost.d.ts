@@ -8,7 +8,7 @@ declare class Wonderlost {
     modules: Map<"Scenery" | "Limbo" | "Narrator" | "Toasted", typeof SceneCreator | typeof Limbo | typeof Narrator | typeof Toasted>;
     moduleInstances: Map<string, Tome>;
     constructor(DEBUG?: boolean);
-    initializeModules(): void;
+    initializeModules(): Promise<void>;
     resolveDependencyOrder(): string[];
     getModule<T extends Tome = Tome>(moduleName: string): T | undefined;
     moduleExists(moduleName: string): boolean;

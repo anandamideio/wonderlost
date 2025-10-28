@@ -31,11 +31,11 @@ class Wonderlost {
     }
   }
 
-  initializeModules() {
+  async initializeModules() {
     // First, create all module instances
     for (const [tomeName, TomeClass] of this.modules) {
       if (this.DEBUG) {
-        consola.start(`Wonderlost | Creating instance of ${tomeName}`);
+        consola.info(`Wonderlost | Creating module: ${tomeName}`);
       }
 
       const module = new TomeClass(this.DEBUG);
@@ -49,23 +49,24 @@ class Wonderlost {
       consola.info(`Wonderlost | Initialization order: ${initOrder.join(', ')}`);
     }
 
-    // Initialize modules in the correct order
+    // Initialize modules in the correct order (now async!)
     for (const tomeName of initOrder) {
       if (this.DEBUG) {
-        consola.start(`Wonderlost | Initializing ${tomeName}`);
+        consola.start(`Wonderlost | Initializing: ${tomeName}`);
       }
 
       const module = this.moduleInstances.get(tomeName);
 
       if (!module) {
-        consola.error(`Wonderlost | Module ${tomeName} not found`);
+        consola.error(`Wonderlost | Module not found: ${tomeName}`);
         continue;
       }
 
-      module.initialize();
+      // Use await since initialize is now async
+      await module.initialize();
 
       if (this.DEBUG) {
-        consola.info(`Wonderlost | Initialized ${tomeName}`);
+        consola.success(`Wonderlost | Initialized: ${tomeName}`);
       }
     }
   }
@@ -119,24 +120,24 @@ class Wonderlost {
     if (this.DEBUG) {
       consola.start('Wonderlost | Shutting down modules');
     }
-    
+
     // Get modules in reverse initialization order to properly handle dependencies
     const shutdownOrder = this.resolveDependencyOrder().reverse();
-    
+
     for (const tomeName of shutdownOrder) {
       if (this.DEBUG) {
         consola.info(`Wonderlost | Shutting down ${tomeName}`);
       }
-      
+
       const module = this.moduleInstances.get(tomeName);
       if (!module) continue;
-      
+
       // Call destroy to clean up resources
       if (typeof module.destroy === 'function') {
         module.destroy();
       }
     }
-    
+
     // Clear all module instances
     this.moduleInstances.clear();
   }
@@ -144,15 +145,18 @@ class Wonderlost {
 
 const wonderlost = new Wonderlost(true);
 
-Hooks.once('setup', () => {
+Hooks.once('setup', async () => {
   consola.start('Wonderlost | Setup started');
-  wonderlost.initializeModules();
+  await wonderlost.initializeModules();
   wonderlost.logAllModules();
   consola.success('Wonderlost | Ready');
 
   // Make API available globally for other modules
-  // @ts-ignore
-  game.modules.get('wonderlost').api = wonderlost;
+  const wonderlostModule = game.modules?.get('wonderlost');
+  if (wonderlostModule) {
+    // biome-ignore lint/suspicious/noExplicitAny: Foundry API requires any
+    (wonderlostModule as any).api = wonderlost;
+  }
 
   window.addEventListener('beforeunload', () => {
     wonderlost.shutdownModules();

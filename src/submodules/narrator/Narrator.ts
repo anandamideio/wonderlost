@@ -162,7 +162,6 @@ export class Narrator extends Tome {
     // Load fonts
     await this.loadFonts();
 
-    this.ready = true;
     if (this.DEBUG) consola.success('Narrator | Setup complete');
   }
 

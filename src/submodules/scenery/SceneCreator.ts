@@ -12,8 +12,7 @@ export class SceneCreator extends Tome {
           'ready',
           async () => {
             // You can initialize scene-related features here
-            if (this.DEBUG) console.log('SceneCreator | Ready');
-            this.ready = true;
+              console.log('SceneCreator | Ready');
           },
         ],
       ],

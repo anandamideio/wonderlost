@@ -34,7 +34,7 @@ export class Limbo extends Tome {
 
 						await this.findOrCreateWaitingRoom();
 
-						this.ready = true;
+
 					},
 				],
 				[

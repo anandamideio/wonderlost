@@ -1,20 +1,30 @@
 import type { HookableEvents, HookEvent, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
+import { TomeHookService } from './services/TomeHookService';
+import { TomeI18nService } from './services/TomeI18nService';
+import { TomeSettingsService } from './services/TomeSettingsService';
+import { TomePhase } from './TomeLifecycle';
 export declare abstract class Tome {
     moduleName: string;
     moduleDescription: string;
-    settings: Array<Rules & {
-        scope: 'world' | 'client';
-    }>;
-    hooks: Map<"init" | "i18nInit" | "setup" | "ready" | "error" | "hotReload" | "pauseGame" | "updateWorldTime" | "canvasConfig" | "canvasInit" | "canvasPan" | "canvasReady" | "canvasTearDown" | "canvasDraw" | "dropCanvasData" | "highlightObjects" | "renderApplication" | "getApplicationHeaderButtons" | "closeApplication" | "getSceneControlButtons" | "hotbarDrop" | "collapseSceneNavigation" | "getApplicationEntryContext" | "collapseSidebar" | "changeSidebarTab" | "drawGroup" | "tearDownGroup" | "drawLayer" | "tearDownLayer" | "pastePlaceableObject" | "applyActiveEffect" | "updateCompendium" | "preCreateDocument" | "preUpdateDocument" | "preDeleteDocument" | "createDocument" | "updateDocument" | "deleteDocument" | "drawObject" | "refreshObject" | "destroyObject" | "controlObject" | "hoverObject" | "applyTokenStatusEffect" | "chatBubble" | "modifyTokenAttribute" | "targetToken" | "activateNote" | "initializeRenderedEffectSourceShaders" | "dealCards" | "passCards" | "returnCards" | "dropActorSheetData" | "activateLayer" | "deactivateLayer" | "initializeVisionSources" | "lightingRefresh" | "visibilityRefresh" | "initializeLightSources" | "initializeDarknessSources" | "sightRefresh" | "initializeWeatherEffects" | "preImportAdventure" | "importAdventure" | "userConnected" | "combatTurnChange" | "combatStart" | "combatTurn" | "combatRound" | "getProseMirrorMenuDropDowns" | "getProseMirrorMenuItems" | "createProseMirrorEditor" | "chatMessage" | "renderChatMessage" | "globalVolumeChanged" | "rtcSettingsChanged" | "dropRollTableSheetData" | "initializeDynamicTokenRingConfig" | "renderChatLog" | "once:init" | "once:i18nInit" | "once:setup" | "once:ready" | "once:error" | "once:hotReload" | "once:pauseGame" | "once:updateWorldTime" | "once:canvasConfig" | "once:canvasInit" | "once:canvasPan" | "once:canvasReady" | "once:canvasTearDown" | "once:canvasDraw" | "once:dropCanvasData" | "once:highlightObjects" | "once:renderApplication" | "once:getApplicationHeaderButtons" | "once:closeApplication" | "once:getSceneControlButtons" | "once:hotbarDrop" | "once:collapseSceneNavigation" | "once:getApplicationEntryContext" | "once:collapseSidebar" | "once:changeSidebarTab" | "once:drawGroup" | "once:tearDownGroup" | "once:drawLayer" | "once:tearDownLayer" | "once:pastePlaceableObject" | "once:applyActiveEffect" | "once:updateCompendium" | "once:preCreateDocument" | "once:preUpdateDocument" | "once:preDeleteDocument" | "once:createDocument" | "once:updateDocument" | "once:deleteDocument" | "once:drawObject" | "once:refreshObject" | "once:destroyObject" | "once:controlObject" | "once:hoverObject" | "once:applyTokenStatusEffect" | "once:chatBubble" | "once:modifyTokenAttribute" | "once:targetToken" | "once:activateNote" | "once:initializeRenderedEffectSourceShaders" | "once:dealCards" | "once:passCards" | "once:returnCards" | "once:dropActorSheetData" | "once:activateLayer" | "once:deactivateLayer" | "once:initializeVisionSources" | "once:lightingRefresh" | "once:visibilityRefresh" | "once:initializeLightSources" | "once:initializeDarknessSources" | "once:sightRefresh" | "once:initializeWeatherEffects" | "once:preImportAdventure" | "once:importAdventure" | "once:userConnected" | "once:combatTurnChange" | "once:combatStart" | "once:combatTurn" | "once:combatRound" | "once:getProseMirrorMenuDropDowns" | "once:getProseMirrorMenuItems" | "once:createProseMirrorEditor" | "once:chatMessage" | "once:renderChatMessage" | "once:globalVolumeChanged" | "once:rtcSettingsChanged" | "once:dropRollTableSheetData" | "once:initializeDynamicTokenRingConfig" | "once:renderChatLog", HookEvent>;
     socketFns: Map<string, (data: unknown) => void>;
     DEBUG?: boolean;
-    ready: boolean;
     enabled: boolean;
     dependencies: Array<string>;
+    private _phase;
+    protected hookService: TomeHookService;
+    protected settingsService: TomeSettingsService;
+    protected i18nService: TomeI18nService;
     private static registry;
-    private registeredHookIDs;
     get name(): string;
     get lowercaseName(): string;
+    /**
+     * Get the current lifecycle phase
+     */
+    get phase(): TomePhase;
+    /**
+     * Check if the module is ready
+     */
+    get ready(): boolean;
     /**
      * Get the module's i18n namespace
      * @returns The namespace used for i18n keys
@@ -58,6 +68,10 @@ export declare abstract class Tome {
         dependencies?: string[];
     });
     /**
+     * Handle the enabled state change
+     */
+    private handleEnabledChange;
+    /**
      * Get a reference to another Tome by name
      * @param tomeName The name of the Tome to get
      * @returns The requested Tome instance or undefined if not found
@@ -85,22 +99,33 @@ export declare abstract class Tome {
      * Remove all hooks registered by this Tome
      */
     removeAllHooks(): this;
-    initializeHooks(): this;
+    initializeHooks(): Promise<this>;
     registerSettings(rules: Array<Rules & {
         scope: 'world' | 'client';
     }>): Tome;
-    initializeSettings(): this;
+    initializeSettings(): Promise<this>;
     static unregisterTome(tomeName: string): boolean;
     destroy(): void;
     protected onModuleEnabled(): void;
     protected onModuleDisabled(): void;
     getSetting<ExpectedReturn = unknown>(settingName: string): ExpectedReturn;
-    setSetting(settingName: string, value: unknown): Promise<unknown>;
+    setSetting(settingName: string, value: unknown): Promise<void>;
     registerSettingSubmenu<Data extends Record<string, unknown> = Record<string, unknown>>(menu: RuleMenu & {
         data: Data;
     }): void;
     initializeSocketListeners(): this;
-    initialize(): this;
+    /**
+     * Initialize the module - now async with error boundaries
+     */
+    initialize(): Promise<void>;
+    /**
+     * Hook for subclasses to override for custom initialization
+     */
+    protected onInitialize(): Promise<void>;
+    /**
+     * Wait for all dependencies to be ready
+     */
+    private waitForDependencies;
     /**
      * Check if all dependencies are ready
      * @returns Whether all dependencies are initialized and ready
@@ -113,11 +138,15 @@ export declare abstract class Tome {
         lowercaseName: string;
         i18nNamespace: string;
         moduleDescription: string;
+        phase: TomePhase;
+        ready: boolean;
+        enabled: boolean;
+        dependencies: string[];
         settings: (Rules & {
             scope: "world" | "client";
         })[];
-        hooks: Map<"init" | "i18nInit" | "setup" | "ready" | "error" | "hotReload" | "pauseGame" | "updateWorldTime" | "canvasConfig" | "canvasInit" | "canvasPan" | "canvasReady" | "canvasTearDown" | "canvasDraw" | "dropCanvasData" | "highlightObjects" | "renderApplication" | "getApplicationHeaderButtons" | "closeApplication" | "getSceneControlButtons" | "hotbarDrop" | "collapseSceneNavigation" | "getApplicationEntryContext" | "collapseSidebar" | "changeSidebarTab" | "drawGroup" | "tearDownGroup" | "drawLayer" | "tearDownLayer" | "pastePlaceableObject" | "applyActiveEffect" | "updateCompendium" | "preCreateDocument" | "preUpdateDocument" | "preDeleteDocument" | "createDocument" | "updateDocument" | "deleteDocument" | "drawObject" | "refreshObject" | "destroyObject" | "controlObject" | "hoverObject" | "applyTokenStatusEffect" | "chatBubble" | "modifyTokenAttribute" | "targetToken" | "activateNote" | "initializeRenderedEffectSourceShaders" | "dealCards" | "passCards" | "returnCards" | "dropActorSheetData" | "activateLayer" | "deactivateLayer" | "initializeVisionSources" | "lightingRefresh" | "visibilityRefresh" | "initializeLightSources" | "initializeDarknessSources" | "sightRefresh" | "initializeWeatherEffects" | "preImportAdventure" | "importAdventure" | "userConnected" | "combatTurnChange" | "combatStart" | "combatTurn" | "combatRound" | "getProseMirrorMenuDropDowns" | "getProseMirrorMenuItems" | "createProseMirrorEditor" | "chatMessage" | "renderChatMessage" | "globalVolumeChanged" | "rtcSettingsChanged" | "dropRollTableSheetData" | "initializeDynamicTokenRingConfig" | "renderChatLog" | "once:init" | "once:i18nInit" | "once:setup" | "once:ready" | "once:error" | "once:hotReload" | "once:pauseGame" | "once:updateWorldTime" | "once:canvasConfig" | "once:canvasInit" | "once:canvasPan" | "once:canvasReady" | "once:canvasTearDown" | "once:canvasDraw" | "once:dropCanvasData" | "once:highlightObjects" | "once:renderApplication" | "once:getApplicationHeaderButtons" | "once:closeApplication" | "once:getSceneControlButtons" | "once:hotbarDrop" | "once:collapseSceneNavigation" | "once:getApplicationEntryContext" | "once:collapseSidebar" | "once:changeSidebarTab" | "once:drawGroup" | "once:tearDownGroup" | "once:drawLayer" | "once:tearDownLayer" | "once:pastePlaceableObject" | "once:applyActiveEffect" | "once:updateCompendium" | "once:preCreateDocument" | "once:preUpdateDocument" | "once:preDeleteDocument" | "once:createDocument" | "once:updateDocument" | "once:deleteDocument" | "once:drawObject" | "once:refreshObject" | "once:destroyObject" | "once:controlObject" | "once:hoverObject" | "once:applyTokenStatusEffect" | "once:chatBubble" | "once:modifyTokenAttribute" | "once:targetToken" | "once:activateNote" | "once:initializeRenderedEffectSourceShaders" | "once:dealCards" | "once:passCards" | "once:returnCards" | "once:dropActorSheetData" | "once:activateLayer" | "once:deactivateLayer" | "once:initializeVisionSources" | "once:lightingRefresh" | "once:visibilityRefresh" | "once:initializeLightSources" | "once:initializeDarknessSources" | "once:sightRefresh" | "once:initializeWeatherEffects" | "once:preImportAdventure" | "once:importAdventure" | "once:userConnected" | "once:combatTurnChange" | "once:combatStart" | "once:combatTurn" | "once:combatRound" | "once:getProseMirrorMenuDropDowns" | "once:getProseMirrorMenuItems" | "once:createProseMirrorEditor" | "once:chatMessage" | "once:renderChatMessage" | "once:globalVolumeChanged" | "once:rtcSettingsChanged" | "once:dropRollTableSheetData" | "once:initializeDynamicTokenRingConfig" | "once:renderChatLog", HookEvent>;
-        socketFns: Map<string, (data: unknown) => void>;
+        hooks: ["ready" | "init" | "i18nInit" | "setup" | "error" | "hotReload" | "pauseGame" | "updateWorldTime" | "canvasConfig" | "canvasInit" | "canvasPan" | "canvasReady" | "canvasTearDown" | "canvasDraw" | "dropCanvasData" | "highlightObjects" | "renderApplication" | "getApplicationHeaderButtons" | "closeApplication" | "getSceneControlButtons" | "hotbarDrop" | "collapseSceneNavigation" | "getApplicationEntryContext" | "collapseSidebar" | "changeSidebarTab" | "drawGroup" | "tearDownGroup" | "drawLayer" | "tearDownLayer" | "pastePlaceableObject" | "applyActiveEffect" | "updateCompendium" | "preCreateDocument" | "preUpdateDocument" | "preDeleteDocument" | "createDocument" | "updateDocument" | "deleteDocument" | "drawObject" | "refreshObject" | "destroyObject" | "controlObject" | "hoverObject" | "applyTokenStatusEffect" | "chatBubble" | "modifyTokenAttribute" | "targetToken" | "activateNote" | "initializeRenderedEffectSourceShaders" | "dealCards" | "passCards" | "returnCards" | "dropActorSheetData" | "activateLayer" | "deactivateLayer" | "initializeVisionSources" | "lightingRefresh" | "visibilityRefresh" | "initializeLightSources" | "initializeDarknessSources" | "sightRefresh" | "initializeWeatherEffects" | "preImportAdventure" | "importAdventure" | "userConnected" | "combatTurnChange" | "combatStart" | "combatTurn" | "combatRound" | "getProseMirrorMenuDropDowns" | "getProseMirrorMenuItems" | "createProseMirrorEditor" | "chatMessage" | "renderChatMessage" | "globalVolumeChanged" | "rtcSettingsChanged" | "dropRollTableSheetData" | "initializeDynamicTokenRingConfig" | "renderChatLog" | "once:ready" | "once:init" | "once:i18nInit" | "once:setup" | "once:error" | "once:hotReload" | "once:pauseGame" | "once:updateWorldTime" | "once:canvasConfig" | "once:canvasInit" | "once:canvasPan" | "once:canvasReady" | "once:canvasTearDown" | "once:canvasDraw" | "once:dropCanvasData" | "once:highlightObjects" | "once:renderApplication" | "once:getApplicationHeaderButtons" | "once:closeApplication" | "once:getSceneControlButtons" | "once:hotbarDrop" | "once:collapseSceneNavigation" | "once:getApplicationEntryContext" | "once:collapseSidebar" | "once:changeSidebarTab" | "once:drawGroup" | "once:tearDownGroup" | "once:drawLayer" | "once:tearDownLayer" | "once:pastePlaceableObject" | "once:applyActiveEffect" | "once:updateCompendium" | "once:preCreateDocument" | "once:preUpdateDocument" | "once:preDeleteDocument" | "once:createDocument" | "once:updateDocument" | "once:deleteDocument" | "once:drawObject" | "once:refreshObject" | "once:destroyObject" | "once:controlObject" | "once:hoverObject" | "once:applyTokenStatusEffect" | "once:chatBubble" | "once:modifyTokenAttribute" | "once:targetToken" | "once:activateNote" | "once:initializeRenderedEffectSourceShaders" | "once:dealCards" | "once:passCards" | "once:returnCards" | "once:dropActorSheetData" | "once:activateLayer" | "once:deactivateLayer" | "once:initializeVisionSources" | "once:lightingRefresh" | "once:visibilityRefresh" | "once:initializeLightSources" | "once:initializeDarknessSources" | "once:sightRefresh" | "once:initializeWeatherEffects" | "once:preImportAdventure" | "once:importAdventure" | "once:userConnected" | "once:combatTurnChange" | "once:combatStart" | "once:combatTurn" | "once:combatRound" | "once:getProseMirrorMenuDropDowns" | "once:getProseMirrorMenuItems" | "once:createProseMirrorEditor" | "once:chatMessage" | "once:renderChatMessage" | "once:globalVolumeChanged" | "once:rtcSettingsChanged" | "once:dropRollTableSheetData" | "once:initializeDynamicTokenRingConfig" | "once:renderChatLog", HookEvent][];
+        socketFns: [string, (data: unknown) => void][];
         DEBUG: boolean | undefined;
     };
 }

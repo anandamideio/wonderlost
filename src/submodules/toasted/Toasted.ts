@@ -1,6 +1,6 @@
 import { El } from '@magik_io/mote';
 import consola from 'consola';
-// @ts-ignore
+// @ts-expect-error
 import { TweenMax } from '/scripts/greensock/esm/all.js';
 import { Tome } from '../../class/Tome';
 
@@ -70,13 +70,11 @@ export class Toasted extends Tome {
 
               document.querySelector('body')?.appendChild(div.element);
 
-              this.ready = true;
               this.ToastedReady = true;
 
               if (this.DEBUG) consola.success(`${this.moduleName} | Chat log rendered`);
             } catch (error) {
               consola.error('Toasted | Error rendering chat log', { error });
-              this.ready = false;
             }
           },
         ],
@@ -495,11 +493,11 @@ export class Toasted extends Tome {
       // Convert to array, keep only the most recent messages
       const messagesArray = Array.from(this.processedMessages);
       const toRemove = messagesArray.slice(0, messagesArray.length - this.MAX_PROCESSED_MESSAGES);
-      
+
       for (const messageId of toRemove) {
         this.processedMessages.delete(messageId);
       }
-      
+
       if (this.DEBUG) {
         consola.info(`Toasted | Cleaned up ${toRemove.length} old message references`);
       }

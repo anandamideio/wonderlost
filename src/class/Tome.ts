@@ -1,22 +1,27 @@
 import consola from 'consola';
-import type { DataModel } from 'src/types/foundry/common/abstract/module.mjs';
-import type { MaybePromise } from 'src/types/types/utils.mjs';
 import type { HookableEvents, HookEvent, RuleMenu, Rules, TomeRuleConstructor } from 'src/types/wonderlost/Tome';
+import { TomeHookService } from './services/TomeHookService';
+import { TomeI18nService } from './services/TomeI18nService';
+import { TomeSettingsService } from './services/TomeSettingsService';
+import { TomeErrorBoundary, TomePhase } from './TomeLifecycle';
 
 export abstract class Tome {
   public moduleName: string;
   public moduleDescription: string;
-  public settings: Array<Rules & { scope: 'world' | 'client' }> = [];
-  public hooks = new Map([] as Array<[HookableEvents | `once:${HookableEvents}`, HookEvent]>);
   public socketFns: Map<string, (data: unknown) => void> = new Map();
   public DEBUG?: boolean = false;
-  public ready = false;
   public enabled = true;
-
   public dependencies: Array<string> = [];
 
+  // Lifecycle phase tracking
+  private _phase: TomePhase = TomePhase.CREATED;
+
+  // Service instances
+  protected hookService: TomeHookService;
+  protected settingsService: TomeSettingsService;
+  protected i18nService: TomeI18nService;
+
   private static registry = new Map<string, Tome>();
-  private registeredHookIDs: Array<{event: string, id: number}> = [];
 
   get name() {
     return this.moduleName;
@@ -27,11 +32,25 @@ export abstract class Tome {
   }
 
   /**
+   * Get the current lifecycle phase
+   */
+  get phase(): TomePhase {
+    return this._phase;
+  }
+
+  /**
+   * Check if the module is ready
+   */
+  get ready(): boolean {
+    return this._phase === TomePhase.READY;
+  }
+
+  /**
    * Get the module's i18n namespace
    * @returns The namespace used for i18n keys
    */
   get i18nNamespace(): string {
-    return `${this.lowercaseName}`;
+    return this.i18nService.namespace;
   }
 
   /**
@@ -40,7 +59,7 @@ export abstract class Tome {
    * @returns The localized string
    */
   localize(key: string): string {
-    return game.i18n!.localize(`${this.i18nNamespace}.${key}`);
+    return this.i18nService.localize(key);
   }
 
   /**
@@ -50,7 +69,7 @@ export abstract class Tome {
    * @returns The formatted string
    */
   format(key: string, data: Record<string, unknown>): string {
-    return game.i18n!.format(`${this.i18nNamespace}.${key}`, data);
+    return this.i18nService.format(key, data);
   }
 
   /**
@@ -59,7 +78,7 @@ export abstract class Tome {
    * @returns Whether the key exists
    */
   hasTranslation(key: string): boolean {
-    return game.i18n!.has(`${this.i18nNamespace}.${key}`);
+    return this.i18nService.hasTranslation(key);
   }
 
   /**
@@ -67,11 +86,11 @@ export abstract class Tome {
    * @returns True if hooks are present, otherwise false
    */
   get hasHooks() {
-    return this.hooks.size > 0;
+    return this.hookService.hasHooks;
   }
 
   get hasSettings() {
-    return this.settings.length > 0;
+    return this.settingsService.hasSettings;
   }
 
   get hasSocketFns() {
@@ -79,12 +98,7 @@ export abstract class Tome {
   }
 
   get needsEarlyInitialization() {
-    return (
-      this.hasSettings ||
-      (this.hasHooks && this.hooks.has('init')) ||
-      (this.hasHooks && this.hooks.has('ready')) ||
-      this.hasSocketFns
-    );
+    return this.hasSettings || this.hookService.needsEarlyInitialization() || this.hasSocketFns;
   }
 
   constructor(
@@ -101,27 +115,67 @@ export abstract class Tome {
   ) {
     this.moduleName = pTome.moduleName;
     this.moduleDescription = pTome.moduleDescription;
-    if (pTome?.settings) {
-      this.settings =
-        pTome.settings.globalSettings?.map((s) => {
-          s.scope = 'world';
-          return s as Rules & { scope: 'world' };
-        }) ?? [];
-
-      this.settings.push(
-        ...(pTome.settings.clientSettings?.map((s) => {
-          s.scope = 'client';
-          return s as Rules & { scope: 'client' };
-        }) ?? []),
-      );
-    }
-
-    this.hooks = pTome?.hooks ? new Map(pTome?.hooks) : new Map();
-    this.socketFns = pTome?.socketFns ?? new Map();
     this.DEBUG = pTome?.DEBUG ?? false;
     this.dependencies = pTome?.dependencies ?? [];
+    this.socketFns = pTome?.socketFns ?? new Map();
+
+    // Initialize services
+    this.i18nService = new TomeI18nService(this.lowercaseName);
+
+    this.hookService = new TomeHookService(this.moduleName, () => this.enabled, this.DEBUG);
+
+    this.settingsService = new TomeSettingsService(
+      this.moduleName,
+      this.lowercaseName,
+      (key: string) => this.i18nService.localize(key),
+      (enabled: boolean) => this.handleEnabledChange(enabled),
+      this.DEBUG,
+    );
+
+    if (pTome?.settings) {
+      // Process settings from constructor
+      const settings: Array<Rules & { scope: 'world' | 'client' }> = [];
+
+      if (pTome.settings.globalSettings) {
+        settings.push(
+          ...pTome.settings.globalSettings.map((s) => ({
+            ...s,
+            scope: 'world' as const,
+          })),
+        );
+      }
+
+      if (pTome.settings.clientSettings) {
+        settings.push(
+          ...pTome.settings.clientSettings.map((s) => ({
+            ...s,
+            scope: 'client' as const,
+          })),
+        );
+      }
+
+      this.settingsService.registerSettings(settings);
+    }
+
+    if (pTome?.hooks) {
+      // Process hooks from constructor
+      this.hookService.addHooks(pTome.hooks);
+    }
 
     Tome.registry.set(this.moduleName, this);
+  }
+
+  /**
+   * Handle the enabled state change
+   */
+  private handleEnabledChange(enabled: boolean): void {
+    this.enabled = enabled;
+
+    if (this.enabled) {
+      this.onModuleEnabled();
+    } else {
+      this.onModuleDisabled();
+    }
   }
 
   /**
@@ -150,11 +204,7 @@ export abstract class Tome {
    * @param overwrite Whether to overwrite an existing hook for the event
    */
   public addHook(event: HookableEvents | `once:${HookableEvents}`, callback: HookEvent, overwrite = false) {
-    if (!this.hooks.has(event) || overwrite) {
-      this.hooks.set(event, callback);
-    } else {
-      consola.warn(`Hook for event "${event}" already exists.`);
-    }
+    this.hookService.addHook(event, callback, overwrite);
   }
 
   /**
@@ -162,115 +212,30 @@ export abstract class Tome {
    * @param event The event to remove the hook from
    */
   public removeHook(event: HookableEvents | `once:${HookableEvents}`) {
-    if (this.hooks.has(event)) {
-      this.hooks.delete(event);
-    } else {
-      consola.warn(`No hook found for event "${event}".`);
-    }
+    this.hookService.removeHook(event);
   }
 
   /**
    * Remove all hooks registered by this Tome
    */
   public removeAllHooks() {
-    if (this.DEBUG) {
-      consola.info(`[TOME::${this.moduleName}] => Removing ${this.registeredHookIDs.length} hooks`);
-    }
-
-    this.registeredHookIDs.forEach(({event, id}) => {
-      Hooks.off(event, id);
-    });
-
-    this.registeredHookIDs = [];
-
-    this.hooks.clear();
-
+    this.hookService.removeAllHooks();
     return this;
   }
 
-  public initializeHooks() {
-    this.hooks.forEach((callback, event) => {
-      if (this.DEBUG) {
-        consola.info(`[TOME::${this.moduleName}] => Registering hook for ${event}`);
-      }
-
-      const isOnce = event.startsWith('once:');
-      const actualEvent = isOnce ? event.replace('once:', '') : event;
-
-      /* Create a wrapped callback so we don't run the hook if disabled */
-      const wrappedCallback = (...args: Parameters<HookEvent>) => {
-        if (!this.enabled) return;
-        return callback(...args);
-      };
-
-      let hookID: number;
-      if (isOnce) {
-        hookID = Hooks.once(actualEvent, wrappedCallback);
-      } else {
-        hookID = Hooks.on(actualEvent, wrappedCallback);
-      }
-
-      // Store the ID of the hook for later removal
-      this.registeredHookIDs.push({event: actualEvent, id: hookID});
-    });
-
+  public async initializeHooks() {
+    await this.hookService.initializeHooks();
     return this;
   }
 
   // Method to register global settings
   public registerSettings(rules: Array<Rules & { scope: 'world' | 'client' }>): Tome {
-    rules.forEach((rule) => {
-      this.settings.push(rule as Rules & { scope: 'world' | 'client' });
-    });
+    this.settingsService.registerSettings(rules);
     return this;
   }
 
-  public initializeSettings() {
-    if (this.DEBUG) {
-      consola.info(`[TOME::${this.moduleName}] => Initializing settings`, this.settings);
-    }
-
-    /** Create the isEnabled rule typed to the module so users can disable the module with ease */
-    game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-isEnabled`), {
-      name: this.localize('isEnabled'),
-      hint: this.localize('isEnabled_hint'),
-      scope: 'world',
-      config: true,
-      default: true,
-      type: Boolean,
-      onChange: (value: unknown) => {
-        this.enabled = value as boolean;
-
-        if (this.enabled) {
-          this.onModuleEnabled();
-        } else {
-          this.onModuleDisabled();
-        }
-
-        if (this.DEBUG) {
-          consola.info(`[TOME::${this.moduleName}] => Module enabled: ${value}`);
-        }
-      },
-    });
-
-    this.settings.forEach((setting) => {
-      game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${setting.name}`), {
-        name: setting.name,
-        hint: setting.hint,
-        scope: setting.scope,
-        config: true,
-        default: setting?.defaultValue,
-        // biome-ignore lint/suspicious/noExplicitAny: <any is expected here>
-        type: setting.type as unknown as any,
-        // @ts-ignore -> These are only there when the type is correct, but TS doesn't know that
-        choices: setting?.choices,
-        // @ts-ignore -> Same as above
-        range: setting?.range,
-        onChange: setting.onChange,
-        requiresReload: setting.requiresReload,
-      });
-    });
-
+  public async initializeSettings() {
+    await this.settingsService.initializeSettings();
     return this;
   }
 
@@ -290,11 +255,10 @@ export abstract class Tome {
     this.removeAllHooks();
 
     // Clear collections
-    this.hooks.clear();
     this.socketFns.clear();
 
-    // Mark as not ready
-    this.ready = false;
+    // Mark as destroyed
+    this._phase = TomePhase.DESTROYED;
     this.enabled = false;
   }
 
@@ -307,104 +271,121 @@ export abstract class Tome {
   }
 
   public getSetting<ExpectedReturn = unknown>(settingName: string) {
-    return game.settings?.get('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${settingName}`)) as ExpectedReturn;
+    return this.settingsService.getSetting<ExpectedReturn>(settingName);
   }
 
   public async setSetting(settingName: string, value: unknown) {
-    return game.settings?.set('wonderlost', Tome.kebabCase(`${this.lowercaseName}-${settingName}`), value);
+    return this.settingsService.setSetting(settingName, value);
   }
 
   public registerSettingSubmenu<Data extends Record<string, unknown> = Record<string, unknown>>(
     menu: RuleMenu & { data: Data },
   ) {
-    game.settings?.register('wonderlost', Tome.kebabCase(`${this.lowercaseName}-allSettings`), {
-      scope: 'world',
-      config: false,
-      // biome-ignore lint/suspicious/noExplicitAny: <any is fine here>
-      type: Object as unknown as DataModel<any, any>,
-      default: menu.data,
-    });
-
-    const lowercaseName = `${this.lowercaseName}`;
-    const moduleName = this.moduleName.toString();
-
-    game.settings?.registerMenu('wonderlost', Tome.kebabCase(`${this.lowercaseName}-allSettings`), {
-      name: menu.name,
-      label: menu.label,
-      hint: menu.hint,
-      icon: menu.icon,
-      restricted: menu.restricted,
-      // @ts-ignore
-      type: class extends FormApplication {
-        constructor() {
-          super({});
-        }
-
-        static get defaultOptions() {
-          return foundry.utils.mergeObject(super.defaultOptions, {
-            title: `Wonderlost: ${moduleName}`,
-            id: `${moduleName}-settings`,
-            width: 550,
-            height: 'auto',
-            popOut: true,
-            closeOnSubmit: true as boolean,
-            template: `modules/wonderlost/submodules/${lowercaseName}/settings.hbs`,
-          });
-        }
-
-        static get moduleName() {
-          return moduleName;
-        }
-
-        getData() {
-          return foundry.utils.isEmpty(
-            game.settings?.get(
-              moduleName,
-              `${moduleName.toLowerCase()}-allSettings`,
-              // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-            ) as any,
-          )
-            ? (game.settings?.get(moduleName, `${moduleName.toLowerCase()}-allSettings`) as MaybePromise<Data>)
-            : (menu.data as MaybePromise<Data>);
-        }
-
-        async _updateObject(_event: Event, formData: Data) {
-          await game.settings?.set(moduleName, `${moduleName.toLowerCase()}-allSettings`, formData);
-        }
-      },
-    });
+    this.settingsService.registerSettingSubmenu(menu);
   }
 
   public initializeSocketListeners() {
     if (this.socketFns.size === 0) return this;
 
     this.socketFns.forEach((fn, event) => {
-      if (this.DEBUG) {
-        consola.info(`Registering socket listener for event: ${event}`);
-      }
-
-      game.socket?.on(event, (data: unknown) => fn(data));
+      TomeErrorBoundary.executeSync(
+        () => {
+          if (this.DEBUG) {
+            consola.info(`${this.moduleName} | Registering socket listener for event: ${event}`);
+          }
+          game.socket?.on(event, (data: unknown) => fn(data));
+        },
+        `socket listener registration for ${event}`,
+        this.moduleName,
+      );
     });
 
     return this;
   }
 
-  public initialize() {
-    if (this.hasSettings) {
-      this.initializeSettings();
+  /**
+   * Initialize the module - now async with error boundaries
+   */
+  public async initialize(): Promise<void> {
+    return TomeErrorBoundary.execute(
+      async () => {
+        if (this._phase !== TomePhase.CREATED) {
+          consola.warn(`${this.moduleName} | Already initialized, current phase: ${this._phase}`);
+          return;
+        }
+
+        // Wait for dependencies
+        await this.waitForDependencies();
+
+        // Initialize settings
+        if (this.hasSettings) {
+          await this.initializeSettings();
+        }
+
+        // Initialize hooks
+        if (this.hasHooks) {
+          await this.initializeHooks();
+        }
+
+        // Initialize socket listeners
+        if (this.hasSocketFns) {
+          this.initializeSocketListeners();
+        }
+
+        // Move to initialized phase
+        this._phase = TomePhase.INITIALIZED;
+
+        // Call onInitialize hook for subclasses
+        await this.onInitialize();
+
+        // Mark as ready
+        this._phase = TomePhase.READY;
+
+        if (this.DEBUG) {
+          consola.success(`${this.moduleName} | Initialized successfully`);
+        }
+      },
+      'module initialization',
+      this.moduleName
+    ).then(() => undefined);
+  }
+
+  /**
+   * Hook for subclasses to override for custom initialization
+   */
+  protected async onInitialize(): Promise<void> {
+    // Override in subclasses
+  }
+
+  /**
+   * Wait for all dependencies to be ready
+   */
+  private async waitForDependencies(): Promise<void> {
+    if (this.dependencies.length === 0) {
+      return;
     }
 
-    if (this.hasHooks) {
-      this.initializeHooks();
+    const maxAttempts = 50;
+    const delayMs = 100;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      if (this.areDependenciesReady()) {
+        if (this.DEBUG) {
+          consola.info(`${this.moduleName} | All dependencies ready`);
+        }
+        return;
+      }
+
+      if (this.DEBUG && attempt === 1) {
+        const unreadyDeps = this.dependencies.filter((dep) => !this.isTomeReady(dep));
+        consola.info(`${this.moduleName} | Waiting for dependencies: ${unreadyDeps.join(', ')}`);
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
 
-    if (this.hasSocketFns) {
-      this.initializeSocketListeners();
-    }
-
-    this.ready = true;
-
-    return this;
+    const unreadyDeps = this.dependencies.filter((dep) => !this.isTomeReady(dep));
+    throw new Error(`Timeout waiting for dependencies: ${unreadyDeps.join(', ')}`);
   }
 
   /**
@@ -423,7 +404,7 @@ export abstract class Tome {
           if (typeof val === 'string') {
             try {
               acc[key] = JSON.parse(val);
-            } catch (e) {
+            } catch {
               acc[key] = val;
             }
           } else {
@@ -451,9 +432,13 @@ export abstract class Tome {
       lowercaseName: this.lowercaseName,
       i18nNamespace: this.i18nNamespace,
       moduleDescription: this.moduleDescription,
-      settings: this.settings,
-      hooks: this.hooks,
-      socketFns: this.socketFns,
+      phase: this._phase,
+      ready: this.ready,
+      enabled: this.enabled,
+      dependencies: this.dependencies,
+      settings: this.settingsService.allSettings,
+      hooks: Array.from(this.hookService.allHooks.entries()),
+      socketFns: Array.from(this.socketFns.entries()),
       DEBUG: this.DEBUG,
     };
   }
