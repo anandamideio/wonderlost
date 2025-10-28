@@ -22,8 +22,5 @@
     "toasted.toastPosition_middleRight": "Middle Right",
     "toasted.toastPosition_bottomLeft": "Lower Left",
     "toasted.toastPosition_bottomCenter": "Lower Center",
-    "toasted.toastPosition_bottomRight": "Lower Right",
-
-    "narrator.isEnabled": "Narrator - Is Enabled?",
-    "narrator.isEnabled_hint": "Is the module enabled?"
+    "toasted.toastPosition_bottomRight": "Lower Right"
 }

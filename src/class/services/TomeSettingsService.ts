@@ -108,7 +108,6 @@ export class TomeSettingsService {
           default: setting?.defaultValue,
           // biome-ignore lint/suspicious/noExplicitAny: <any is expected here>
           type: setting.type as unknown as any,
-          // @ts-expect-error -> These are only there when the type is correct
           choices: setting?.choices,
           // @ts-expect-error -> Same as above
           range: setting?.range,

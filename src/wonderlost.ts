@@ -1,22 +1,19 @@
 import consola from 'consola';
 import type { Tome } from './class/Tome';
 import { Limbo } from './submodules/limbo/Limbo';
-import { Narrator } from './submodules/narrator/Narrator';
 import { SceneCreator } from './submodules/scenery/SceneCreator';
 import { Toasted } from './submodules/toasted/Toasted';
 
 type ToastedTuple = ['Toasted', typeof Toasted];
-type NarratorTuple = ['Narrator', typeof Narrator];
 type SceneryTuple = ['Scenery', typeof SceneCreator];
 type LimboTuple = ['Limbo', typeof Limbo];
 
 class Wonderlost {
   public modules = new Map<
-    'Toasted' | 'Narrator' | 'Scenery' | 'Limbo',
-    typeof Toasted | typeof Narrator | typeof SceneCreator | typeof Limbo
+    'Toasted' | 'Scenery' | 'Limbo',
+    typeof Toasted | typeof SceneCreator | typeof Limbo
   >([
     ['Toasted', Toasted] as ToastedTuple,
-    ['Narrator', Narrator] as NarratorTuple,
     ['Scenery', SceneCreator] as SceneryTuple,
     ['Limbo', Limbo] as LimboTuple,
   ]);
