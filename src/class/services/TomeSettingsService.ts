@@ -166,7 +166,6 @@ export class TomeSettingsService {
       hint: menu.hint,
       icon: menu.icon,
       restricted: menu.restricted,
-      // @ts-expect-error
       type: class extends FormApplication {
         constructor() {
           super({});

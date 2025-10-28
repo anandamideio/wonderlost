@@ -71,7 +71,7 @@ export class Limbo extends Tome {
 							consola.warn("Limbo | Notes control not found");
 						}
 
-						return controls;
+						return;
 					},
 				],
 			],

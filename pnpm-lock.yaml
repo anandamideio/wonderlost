@@ -20,6 +20,9 @@ importers:
         specifier: ^3.4.2
         version: 3.4.2
     devDependencies:
+      '@anandamideio/foundry-types':
+        specifier: ^13.350.1
+        version: 13.350.1
       '@assetval/confs':
         specifier: ^1.0.0
         version: 1.0.0
@@ -70,6 +73,9 @@ importers:
         version: 8.46.2(eslint@9.38.0(jiti@2.5.1))(typescript@5.8.3)
 
 packages:
+
+  '@anandamideio/foundry-types@13.350.1':
+    resolution: {integrity: sha512-p7pa+IXFloXjra48YlC4NlZaR6clkkjfA+LN97daRIg9gBKfeU/n2irFUiUgjVrsU0Oy3jfhamm9SJzLvNcdEQ==}
 
   '@assetval/confs@1.0.0':
     resolution: {integrity: sha512-AKYhoh4ourn4aT6pjJP2y2D73BBuC26xu6IKYUITNoespeWuvQilwAHFsX3ubMhSuM90jiaLzM+JEZDWX21Fvw==}
@@ -1518,6 +1524,8 @@ packages:
     engines: {node: '>=10'}
 
 snapshots:
+
+  '@anandamideio/foundry-types@13.350.1': {}
 
   '@assetval/confs@1.0.0': {}
 
