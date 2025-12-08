@@ -1,5 +1,5 @@
-import consola from 'consola';
 import { Tome } from '@anandamideio/tome';
+import consola from 'consola';
 
 export class SceneCreator extends Tome {
   constructor(DEBUG = false) {
@@ -13,7 +13,7 @@ export class SceneCreator extends Tome {
           'ready',
           async () => {
             // You can initialize scene-related features here
-              console.log('SceneCreator | Ready');
+            console.log('SceneCreator | Ready');
           },
         ],
       ],

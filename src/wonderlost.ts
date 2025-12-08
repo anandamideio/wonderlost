@@ -1,5 +1,5 @@
-import consola from 'consola';
 import type { Tome } from '@anandamideio/tome';
+import consola from 'consola';
 import { Limbo } from './submodules/limbo/Limbo';
 import { SceneCreator } from './submodules/scenery/SceneCreator';
 import { Toasted } from './submodules/toasted/Toasted';
@@ -9,10 +9,7 @@ type SceneryTuple = ['Scenery', typeof SceneCreator];
 type LimboTuple = ['Limbo', typeof Limbo];
 
 class Wonderlost {
-  public modules = new Map<
-    'Toasted' | 'Scenery' | 'Limbo',
-    typeof Toasted | typeof SceneCreator | typeof Limbo
-  >([
+  public modules = new Map<'Toasted' | 'Scenery' | 'Limbo', typeof Toasted | typeof SceneCreator | typeof Limbo>([
     ['Toasted', Toasted] as ToastedTuple,
     ['Scenery', SceneCreator] as SceneryTuple,
     ['Limbo', Limbo] as LimboTuple,

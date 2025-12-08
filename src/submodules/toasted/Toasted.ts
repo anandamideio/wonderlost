@@ -1,8 +1,8 @@
+import { Tome } from '@anandamideio/tome';
 import { El } from '@magik_io/mote';
 import consola from 'consola';
 // @ts-expect-error
 import { TweenMax } from '/scripts/greensock/esm/all.js';
-import { Tome } from '@anandamideio/tome';
 
 type ToastPosition =
   | 'upperLeft'
