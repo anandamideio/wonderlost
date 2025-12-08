@@ -14,9 +14,9 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "baseUrl": ".",
     "paths": {
-      "/scripts/greensock/esm/*": ["node_modules/gsap/dist/*"]
+      "/scripts/greensock/esm/*": ["./node_modules/gsap/dist/*"],
+      "*": ["./*"]
     },
     "typeRoots": ["@anandamideio/foundry-types"],
   },
