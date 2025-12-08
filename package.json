@@ -36,13 +36,14 @@
     }
   },
   "dependencies": {
+    "@anandamideio/tome": "^0.1.1",
     "@magik_io/mote": "^1.6.7",
     "consola": "^3.4.2"
   },
   "devDependencies": {
     "@anandamideio/foundry-types": "^13.350.1",
     "@assetval/confs": "^1.0.0",
-    "@biomejs/biome": "2.3.1",
+    "@biomejs/biome": "2.3.8",
     "@magik_io/lint_golem": "^3.4.0",
     "@rollup/plugin-alias": "^5.1.1",
     "@rollup/plugin-node-resolve": "^16.0.1",
@@ -51,7 +52,6 @@
     "@types/jquery": "^3.5.32",
     "@types/node": "^24.9.1",
     "eslint": "^9.38.0",
-    "fvtt-types": "github:League-of-Foundry-Developers/foundry-vtt-types#main",
     "gsap": "^3.12.7",
     "pixi.js": "^8.9.1",
     "rollup": "^4.46.2",

@@ -1,4 +1,4 @@
-import { Tome } from 'src/class/Tome';
+import { Tome } from '@anandamideio/tome';
 export declare class SceneCreator extends Tome {
     constructor(DEBUG?: boolean);
     /**
@@ -6,12 +6,12 @@ export declare class SceneCreator extends Tome {
      * @param {Partial<SceneData>} sceneData The scene data
      * @returns Promise with the created scene
      */
-    createScene(sceneData: Partial<SceneData>): Promise<import("../../types/types/utils.mjs").ConfiguredStoredDocument<typeof Scene> | null | undefined>;
+    createScene(sceneData: Partial<SceneData>): Promise<any>;
     /**
      * Create a scene and activate it
      * @param {Partial<SceneData>} sceneData The scene data
      * @returns Promise with the activated scene
      */
-    createAndActivateScene(sceneData: Partial<SceneData>): Promise<import("../../types/types/utils.mjs").ConfiguredStoredDocument<typeof Scene> | null | undefined>;
+    createAndActivateScene(sceneData: Partial<SceneData>): Promise<any>;
 }
 //# sourceMappingURL=SceneCreator.d.ts.map

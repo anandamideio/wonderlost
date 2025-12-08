@@ -1,5 +1,5 @@
 import consola from "consola";
-import { Tome } from "src/class/Tome";
+import { Tome } from "@anandamideio/tome";
 import type { ConfiguredStoredDocument } from "src/types/types/utils.mjs";
 import type { SceneCreator } from "../scenery/SceneCreator";
 
@@ -16,6 +16,7 @@ export class Limbo extends Tome {
 			moduleName: "Limbo",
 			moduleDescription:
 				"A waiting room for your players while you plan the game",
+			namespace: "wonderlost",
 			DEBUG,
 			dependencies: ["Scenery"],
 			hooks: [

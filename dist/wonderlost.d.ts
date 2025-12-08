@@ -1,11 +1,10 @@
-import type { Tome } from './class/Tome';
+import type { Tome } from '@anandamideio/tome';
 import { Limbo } from './submodules/limbo/Limbo';
-import { Narrator } from './submodules/narrator/Narrator';
 import { SceneCreator } from './submodules/scenery/SceneCreator';
 import { Toasted } from './submodules/toasted/Toasted';
 declare class Wonderlost {
     DEBUG: boolean;
-    modules: Map<"Scenery" | "Limbo" | "Narrator" | "Toasted", typeof SceneCreator | typeof Limbo | typeof Narrator | typeof Toasted>;
+    modules: Map<"Scenery" | "Limbo" | "Toasted", typeof SceneCreator | typeof Limbo | typeof Toasted>;
     moduleInstances: Map<string, Tome>;
     constructor(DEBUG?: boolean);
     initializeModules(): Promise<void>;

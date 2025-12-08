@@ -1,5 +1,5 @@
 import consola from 'consola';
-import type { Tome } from './class/Tome';
+import type { Tome } from '@anandamideio/tome';
 import { Limbo } from './submodules/limbo/Limbo';
 import { SceneCreator } from './submodules/scenery/SceneCreator';
 import { Toasted } from './submodules/toasted/Toasted';

@@ -1,5 +1,5 @@
 import { El } from '@magik_io/mote';
-import { Tome } from '../../class/Tome';
+import { Tome } from '@anandamideio/tome';
 type ToastPosition = 'upperLeft' | 'upperCenter' | 'upperRight' | 'middleLeft' | 'middleCenter' | 'middleRight' | 'lowerLeft' | 'lowerCenter' | 'lowerRight';
 export declare class Toasted extends Tome {
     maxMessagesOnScreen: number;

@@ -2,7 +2,7 @@ import { El } from '@magik_io/mote';
 import consola from 'consola';
 // @ts-expect-error
 import { TweenMax } from '/scripts/greensock/esm/all.js';
-import { Tome } from '../../class/Tome';
+import { Tome } from '@anandamideio/tome';
 
 type ToastPosition =
   | 'upperLeft'
@@ -33,6 +33,7 @@ export class Toasted extends Tome {
     super({
       moduleName: 'Toasted',
       moduleDescription: 'A customizable toast notification system',
+      namespace: 'wonderlost',
       hooks: [
         [
           'renderChatLog',

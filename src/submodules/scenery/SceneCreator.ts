@@ -1,11 +1,12 @@
 import consola from 'consola';
-import { Tome } from 'src/class/Tome';
+import { Tome } from '@anandamideio/tome';
 
 export class SceneCreator extends Tome {
   constructor(DEBUG = false) {
     super({
       moduleName: 'Scenery',
       moduleDescription: 'A module for creating and managing scenes',
+      namespace: 'wonderlost',
       DEBUG,
       hooks: [
         [

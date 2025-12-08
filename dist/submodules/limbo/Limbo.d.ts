@@ -1,4 +1,4 @@
-import { Tome } from "src/class/Tome";
+import { Tome } from "@anandamideio/tome";
 export declare class Limbo extends Tome {
     private sceneryInstance;
     private playerWaitingScreen;
